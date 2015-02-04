@@ -1,8 +1,8 @@
 EMACS=$(shell if [ -z "`which emacs`" ]; then echo "Emacs executable not found"; exit 1; else echo emacs; fi)
 
-BATCHEMACS=${EMACS} --batch --no-site-file -q -eval '(add-to-list (quote load-path) "${PWD}/")'
+BATCHEMACS=${EMACS} --batch --no-site-file -q -eval '(progn (add-to-list (quote load-path) "${PWD}/") (require (quote package)) (package-initialize))'
 
-BYTECOMP = $(BATCHEMACS) -eval '(progn (require (quote bytecomp)) (setq byte-compile-warnings t) (setq byte-compile-error-on-warn t) (require (quote package)) (package-initialize))' -f batch-byte-compile
+BYTECOMP = $(BATCHEMACS) -eval '(progn (require (quote bytecomp)) (setq byte-compile-warnings t) (setq byte-compile-error-on-warn t))' -f batch-byte-compile
 
 default:
 	@echo Try \'make help\'
@@ -39,7 +39,7 @@ deps:
 	$(BATCHEMACS) -eval '(progn (require (quote package)) (add-to-list (quote package-archives) (cons "melpa" "http://melpa.org/packages/")) (package-initialize) (package-refresh-contents) (package-install (quote dash)) (package-install (quote faceup)))'
 
 doc:
-	$(BATCHEMACS) -eval '(progn (require (quote package)) (package-initialize))' -l racket-make-doc.el -f racket-make-doc/write-reference-file
+	$(BATCHEMACS) -l racket-make-doc.el -f racket-make-doc/write-reference-file
 
 test: test-racket test-elisp
 
@@ -47,4 +47,4 @@ test-racket:
 	raco test -x ./*.rkt  # not example/*.rkt
 
 test-elisp:
-	$(BATCHEMACS) -eval '(progn (require (quote package)) (package-initialize))' -l ert -l racket-tests.el -f ert-run-tests-batch-and-exit
+	$(BATCHEMACS) -l ert -l racket-tests.el -f ert-run-tests-batch-and-exit
