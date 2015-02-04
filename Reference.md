@@ -1,10 +1,12 @@
 # racket-mode Reference
 
+- [Commands](#commands)
+- [Variables](#variables)
 ---
 
-# Commands
+## Commands
 
-## racket-run
+### racket-run
 <kbd>&lt;f5&gt;</kbd> or <kbd>C-c C-k</kbd>
 
 Save and evaluate the buffer in REPL, like DrRacket's Run.
@@ -55,7 +57,7 @@ commands. Some of them are the foundation for Emacs commands. Others
       not specified individually.
 
 
-## racket-test
+### racket-test
 <kbd>&lt;C-f5&gt;</kbd>
 
 Do `(require (submod "." test))` in `*racket*` buffer.
@@ -65,33 +67,33 @@ See also:
 - [`racket-unfold-all-tests`](#racket-unfold-all-tests)
 
 
-## racket-racket
+### racket-racket
 <kbd>&lt;C-M-f5&gt;</kbd>
 
 Do `racket <file>` in `*shell*` buffer.
 
-## racket-raco-test
+### racket-raco-test
 
 
 Do `raco test -x <file>` in `*shell*` buffer.
 To run <file>'s `test` submodule.
 
-## racket-send-region
+### racket-send-region
 <kbd>C-c C-r</kbd>
 
 Send the current region (if any) to the Racket REPL.
 
-## racket-send-definition
+### racket-send-definition
 <kbd>C-M-x</kbd>
 
 Send the current definition to the Racket REPL.
 
-## racket-send-last-sexp
+### racket-send-last-sexp
 <kbd>C-x C-e</kbd>
 
 Send the previous sexp to the Racket REPL.
 
-## racket-visit-definition
+### racket-visit-definition
 <kbd>M-.</kbd>
 
 Visit definition of symbol at point.
@@ -108,7 +110,7 @@ list, as opposed to `'lexical`).
 Note: If the definition is from Racket's `#%kernel` module, it
 will tell you so but won't visit the definition site.
 
-## racket-visit-module
+### racket-visit-module
 <kbd>C-M-.</kbd>
 
 Visit definition of module at point, e.g. net/url or "file.rkt".
@@ -120,12 +122,12 @@ namespace is active.
 
 See also: [`racket-find-collection`](#racket-find-collection).
 
-## racket-unvisit
+### racket-unvisit
 <kbd>M-,</kbd>
 
 Return from previous [`racket-visit-definition`](#racket-visit-definition) or [`racket-visit-module`](#racket-visit-module).
 
-## racket-describe
+### racket-describe
 <kbd>C-c C-.</kbd>
 
 Describes the function at point in a `*Racket Describe*` buffer.
@@ -151,17 +153,17 @@ bottom of the buffer are Emacs buttons (which you may navigate among
 using <kbd>TAB</kbd> for visiting the definition or opening the full
 browser documentation (if any).
 
-## racket-fold-all-tests
+### racket-fold-all-tests
 <kbd>C-c C-f</kbd>
 
 Fold (hide) all test submodules.
 
-## racket-unfold-all-tests
+### racket-unfold-all-tests
 <kbd>C-c C-u</kbd>
 
 Unfold (show) all test submodules.
 
-## racket-expand-region
+### racket-expand-region
 <kbd>C-c C-e r</kbd>
 
 Like [`racket-send-region`](#racket-send-region), but macro expand.
@@ -170,7 +172,7 @@ With C-u prefix, expands fully.
 
 Otherwise, expands once. You may use [`racket-expand-again`](#racket-expand-again).
 
-## racket-expand-definition
+### racket-expand-definition
 <kbd>C-c C-e x</kbd>
 
 Like [`racket-send-definition`](#racket-send-definition), but macro expand.
@@ -179,7 +181,7 @@ With C-u prefix, expands fully.
 
 Otherwise, expands once. You may use [`racket-expand-again`](#racket-expand-again).
 
-## racket-expand-last-sexp
+### racket-expand-last-sexp
 <kbd>C-c C-e e</kbd>
 
 Like [`racket-send-last-sexp`](#racket-send-last-sexp), but macro expand.
@@ -188,7 +190,7 @@ With C-u prefix, expands fully.
 
 Otherwise, expands once. You may use [`racket-expand-again`](#racket-expand-again).
 
-## racket-expand-again
+### racket-expand-again
 <kbd>C-c C-e a</kbd>
 
 Macro expand again the previous expansion done by one of:
@@ -197,7 +199,7 @@ Macro expand again the previous expansion done by one of:
 - [`racket-expand-last-sexp`](#racket-expand-last-sexp)
 - [`racket-expand-again`](#racket-expand-again)
 
-## racket-gui-macro-stepper
+### racket-gui-macro-stepper
 
 Run the DrRacket GUI macro stepper.
 
@@ -208,7 +210,7 @@ EXPERIMENTAL: May be changed or removed.
 BUGGY: The first-ever invocation might not display a GUI window.
 If so, try again.
 
-## racket-tidy-requires
+### racket-tidy-requires
 
 
 Make a single top-level `require`, modules sorted, one per line.
@@ -236,7 +238,7 @@ file using `#lang`. It does *not* work for `require`s inside
 
 See also: [`racket-trim-requires`](#racket-trim-requires) and [`racket-base-requires`](#racket-base-requires).
 
-## racket-trim-requires
+### racket-trim-requires
 
 
 Like [`racket-tidy-requires`](#racket-tidy-requires) but also deletes unused modules.
@@ -250,7 +252,7 @@ file using `#lang`. It does *not* work for `require`s inside
 
 See also: [`racket-base-requires`](#racket-base-requires).
 
-## racket-base-requires
+### racket-base-requires
 
 
 Change from `#lang racket` to `#lang racket/base`.
@@ -276,7 +278,7 @@ Note: Currently this only helps change `#lang racket` to
 `#lang racket/base`. It does *not* help with other similar conversions,
 such as changing `#lang typed/racket` to `#lang typed/racket/base`.
 
-## racket-doc
+### racket-doc
 <kbd>C-c C-d</kbd>
 
 View documentation of the identifier or string at point.
@@ -294,12 +296,12 @@ variant of racket/help.)
 With a C-u prefix, prompts for the identifier or quoted string,
 instead of looking at point.
 
-## racket-newline-and-indent
+### racket-newline-and-indent
 <kbd>RET</kbd>
 
 Do `newline` and [`racket-indent-line`](#racket-indent-line).
 
-## racket-indent-or-complete
+### racket-indent-or-complete
 <kbd>TAB</kbd>
 
 Try `indent-for-tab-command` then `completion-at-point`.
@@ -312,7 +314,7 @@ in/after at least 3 word/symbol characters, then call
 Note: Completion only finds symbols in the current namespace. You
 may need to [`racket-run`](#racket-run) the buffer, first.
 
-## racket-indent-line
+### racket-indent-line
 
 Indent current line as Racket code.
 
@@ -356,7 +358,7 @@ to this:
       blah)
 
 
-## racket-open-require-path
+### racket-open-require-path
 <kbd>C-c C-x C-f</kbd>
 
 Like Dr Racket's Open Require Path.
@@ -375,7 +377,7 @@ at the top, marked with "->".
 Note: This requires Racket 6.1.1.6 or newer. Otherwise it won't
 error, it will just never return any matches.
 
-## racket-find-collection
+### racket-find-collection
 
 
 Given a collection name, try to find its directory and files.
@@ -399,7 +401,7 @@ Also handy is the `flx-ido` package from MELPA.
 
 See also: [`racket-visit-module`](#racket-visit-module) and [`racket-open-require-path`](#racket-open-require-path).
 
-## racket-smart-open-bracket
+### racket-smart-open-bracket
 <kbd>[</kbd>
 
 Automatically insert a '(' or a '[' as appropriate.
@@ -431,29 +433,29 @@ To disable: Customize [`racket-smart-open-bracket-enable`](#racket-smart-open-br
 like the 'Automatically adjust opening square brackets'
 preference in Dr. Racket.
 
-## racket-cycle-paren-shapes
+### racket-cycle-paren-shapes
 <kbd>C-c C-p</kbd>
 
 In an s-expression, move to the opening, and cycle the shape among () [] {}
 
-## racket-backward-up-list
+### racket-backward-up-list
 <kbd>C-M-u</kbd>
 
 Like `backward-up-list` but also works when point is in a string literal.
 
 ---
 
-# Variables
+## Variables
 
 > Note: You may also set these via Customize.
 
-## racket-racket-program
+### racket-racket-program
 Pathname of the racket executable.
 
-## racket-raco-program
+### racket-raco-program
 Pathname of the raco executable.
 
-## racket-memory-limit
+### racket-memory-limit
 Terminate the Racket process if memory use exceeds this value in MB.
 Changes to this value take effect upon the next [`racket-run`](#racket-run).
 
@@ -462,32 +464,32 @@ enforce the limit exactly. Instead, the program will be
 terminated upon the first garbage collection where memory exceeds
 the limit (maybe by a significant amount).
 
-## racket-history-filter-regexp
+### racket-history-filter-regexp
 Input matching this regexp are not saved on the history list.
 Defaults to a regexp ignoring all inputs of 0, 1, or 2 letters.
 
-## racket-images-inline
+### racket-images-inline
 Whether to display inline images in the REPL.
 
-## racket-images-keep-last
+### racket-images-keep-last
 How many images to keep in the image cache.
 
-## racket-images-system-viewer
+### racket-images-system-viewer
 Which system image viewer program to invoke upon M-x
  [`racket-view-last-image`](#racket-view-last-image).
 
-## racket-pretty-print
+### racket-pretty-print
 Use pretty-print instead of print in REPL.
 
-## racket-wait-for-prompt-timeout
+### racket-wait-for-prompt-timeout
 When REPL starts Racket process, how long to wait for Racket prompt.
 
-## racket-indent-curly-as-sequence
+### racket-indent-curly-as-sequence
 Indent {} with items aligned with the head item?
 This is indirectly disabled if [`racket-indent-sequence-depth`](#racket-indent-sequence-depth) is 0.
 This is safe to set as a file-local variable.
 
-## racket-indent-sequence-depth
+### racket-indent-sequence-depth
 To what depth should [`racket--align-sequence-to-head`](#racket--align-sequence-to-head) search.
 This affects the indentation of forms like '() `() #() -- and {}
 if [`racket-indent-curly-as-sequence`](#racket-indent-curly-as-sequence) is t -- but not #'() #`()
@@ -496,25 +498,25 @@ behavior of DrRacket or Emacs `lisp-mode` derived modes like
 `scheme-mode`. Setting this to a high value can make indentation
 noticeably slower. This is safe to set as a file-local variable.
 
-## racket-pretty-lambda
+### racket-pretty-lambda
 Display lambda keywords using λ. This is deprecated.
 Instead you can insert actual λ characters using \<racket-mode-map>\[racket-insert-lambda].
 
-## racket-smart-open-bracket-enable
+### racket-smart-open-bracket-enable
 Use [`racket-smart-open-bracket`](#racket-smart-open-bracket) when '[' is pressed?
 
-## racket-use-company-mode
+### racket-use-company-mode
 Enable company-mode for racket-mode edit buffers?
 
-## racket-keyword-argument-face
+### racket-keyword-argument-face
 No documentation.
 
 
 
-## racket-paren-face
+### racket-paren-face
 No documentation.
 
 
 
-## racket-selfeval-face
+### racket-selfeval-face
 No documentation.

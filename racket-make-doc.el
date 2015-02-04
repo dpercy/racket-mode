@@ -24,6 +24,7 @@
                     (file-name-directory (or load-file-name (buffer-file-name)))))
 
 (defun racket-make-doc/write-reference-file ()
+  (interactive)
   (with-temp-buffer
     (insert (racket-make-doc/reference))
     (let ((backup-inhibited t))
@@ -31,12 +32,16 @@
 
 
 (defun racket-make-doc/reference ()
-  (concat "# racket-mode Reference\n\n"
+  (concat "# racket-mode Reference\n"
+          "\n"
+          "- [Commands](#commands)\n"
+          "- [Variables](#variables)\n"
+          "\n"
           "---\n\n"
-          "# Commands\n\n"
+          "## Commands\n\n"
           (racket-make-doc/commands)
           "---\n\n"
-          "# Variables\n\n"
+          "## Variables\n\n"
           "> Note: You may also set these via Customize.\n\n"
           (racket-make-doc/variables)))
 
@@ -79,7 +84,7 @@
          (mapcar #'racket-make-doc/command racket-make-doc/commands)))
 
 (defun racket-make-doc/command (symbol)
-  (concat (format "## %s\n" symbol)
+  (concat (format "### %s\n" symbol)
           (racket-make-doc/bindings-as-kbd symbol)
           (racket-make-doc/tweak-quotes
            (racket-make-doc/linkify
@@ -140,7 +145,7 @@
          (mapcar #'racket-make-doc/variable racket-make-doc/variables)))
 
 (defun racket-make-doc/variable (symbol)
-  (concat (format "## %s\n" symbol)
+  (concat (format "### %s\n" symbol)
           (racket-make-doc/tweak-quotes
            (racket-make-doc/linkify
             (or (documentation-property symbol 'variable-documentation t)
