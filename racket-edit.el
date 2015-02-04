@@ -51,12 +51,11 @@ commands. Some of them are the foundation for Emacs commands. Others
 
 - `,top`: Reset the REPL to \"no file\" (i.e. a base namespace).
 
-- `,run <file>`: Run the file. What **racket-run** <kbd>F5</kbd>
-  uses. Either `\"file.rkt\"` is `file.rkt` OK.
+- `,run <file>`: Run the file. What `racket-run' uses. Either
+  `\"file.rkt\"` is `file.rkt` OK.
 
 - `,doc <symbol-or-string>`: Look for `<symbol-or-string>` in
-  Racket's documentation. What **racket-doc** <kbd>C-c C-d</kbd>
-  uses.
+  Racket's documentation. What `racket-doc'uses.
 
 - `,cd`, `,pwd`: Change and show [`current-directory`].
 
