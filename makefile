@@ -47,4 +47,4 @@ test-racket:
 	raco test -x ./*.rkt  # not example/*.rkt
 
 test-elisp:
-	$(BATCHEMACS) -l ert -l racket-tests.el -f ert-run-tests-batch-and-exit
+	$(BATCHEMACS) -eval '(progn (require (quote package)) (package-initialize))' -l ert -l racket-tests.el -f ert-run-tests-batch-and-exit
