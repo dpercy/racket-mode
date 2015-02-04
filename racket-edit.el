@@ -49,10 +49,10 @@ In the `*Racket REPL*` buffer you can issue some special
 commands. Some of them are the foundation for Emacs commands. Others
  are available only as a command in the REPL.
 
-- `,top`: Reset the REPL to "no file" (i.e. a base namespace).
+- `,top`: Reset the REPL to \"no file\" (i.e. a base namespace).
 
 - `,run <file>`: Run the file. What **racket-run** <kbd>F5</kbd>
-  uses. Either `"file.rkt"` is `file.rkt` OK.
+  uses. Either `\"file.rkt\"` is `file.rkt` OK.
 
 - `,doc <symbol-or-string>`: Look for `<symbol-or-string>` in
   Racket's documentation. What **racket-doc** <kbd>C-c C-d</kbd>
