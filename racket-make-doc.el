@@ -2,22 +2,28 @@
 ;;; Generate a markdown format file for Reference documentation.
 
 
+;; Ensure the dash package is installed, e.g. on Travis CI.
+(require 'package)
+(add-to-list 'package-archives
+             '("melpa" . "http://melpa.milkbox.net/packages/") t)
+(package-initialize)
+(unless (package-installed-p 'dash)
+  (condition-case ()
+      (package-install 'dash)
+    (error (package-refresh-contents)
+           (package-install 'dash))))
+(require 'dash)
+
 ;;; Top
 
-(defun racket-make-doc/write-file (&optional file-name)
-  (interactive
-   (let ((suggested-name "Reference.md"))
-     (list (read-file-name "Write Reference markdown file: "
-                           default-directory
-                           suggested-name
-                           nil
-                           (file-name-nondirectory suggested-name)))))
-  (unless file-name
-    (error "no file name"))
-  (let ((buffer (current-buffer)))
-    (with-temp-buffer
-      (insert (racket-make-doc/reference))
-      (write-file file-name t))))
+(defvar racket-make-doc/Reference.md
+  (expand-file-name "Reference.md"
+                    (file-name-directory (or load-file-name (buffer-file-name)))))
+
+(defun racket-make-doc/write-reference-file ()
+  (with-temp-buffer
+    (insert (racket-make-doc/reference))
+    (write-file racket-make-doc/Reference.md nil)))
 
 
 (defun racket-make-doc/reference ()
@@ -81,18 +87,28 @@
   (let ((bindings (racket-make-doc/bindings symbol)))
     (if bindings
         (apply #'concat
-               `(,@(mapcar (lambda (binding)
-                             (if (eq (aref binding 0) 'menu-bar)
-                                 ""
-                               (format "<kbd>%s</kbd> "
-                                       (key-description binding))))
-                           bindings)
+               (-snoc
+                (-interpose " or "
+                            (-non-nil
+                             (-map (lambda (binding)
+                                     (unless (eq (aref binding 0) 'menu-bar)
+                                       (format "<kbd>%s</kbd>"
+                                               (racket-make-doc/html-escape
+                                                (key-description binding)))))
+                                   bindings)))
                  "\n\n"))
-      "")))
+      "\n")))
 
 (defun racket-make-doc/bindings (symbol)
   (where-is-internal symbol racket-mode-map))
 
+(defun racket-make-doc/html-escape (str)
+  (with-temp-buffer
+    (insert str)
+    (format-replace-strings '(("&" . "&amp;")
+                              ("<" . "&lt;")
+                              (">" . "&gt;")))
+    (buffer-substring-no-properties (point-min) (point-max))))
 
 ;;; Variables
 

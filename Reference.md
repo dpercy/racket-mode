@@ -5,7 +5,7 @@
 # Commands
 
 ## racket-run
-<kbd><f5></kbd>
+<kbd>&lt;f5&gt;</kbd> or <kbd>C-c C-k</kbd>
 
 Save and evaluate the buffer in REPL, like DrRacket's Run.
 
@@ -32,7 +32,7 @@ commands. Some of them are the foundation for Emacs commands. Others
 - `,top`: Reset the REPL to
 
 ## racket-test
-<kbd><C-f5></kbd>
+<kbd>&lt;C-f5&gt;</kbd>
 
 Do `(require (submod "." test))` in `*racket*` buffer.
 
@@ -42,12 +42,11 @@ See also:
 
 
 ## racket-racket
-<kbd><C-M-f5></kbd>
+<kbd>&lt;C-M-f5&gt;</kbd>
 
 Do `racket <file>` in `*shell*` buffer.
 
 ## racket-raco-test
-
 
 Do `raco test -x <file>` in `*shell*` buffer.
 To run <file>'s `test` submodule.
@@ -174,6 +173,7 @@ Macro expand again the previous expansion done by one of:
 - [`racket-expand-again`](#racket-expand-again)
 
 ## racket-gui-macro-stepper
+
 Run the DrRacket GUI macro stepper.
 
 Runs on the active region, if any, else the entire buffer.
@@ -184,7 +184,6 @@ BUGGY: The first-ever invocation might not display a GUI window.
 If so, try again.
 
 ## racket-tidy-requires
-
 
 Make a single top-level `require`, modules sorted, one per line.
 
@@ -213,7 +212,6 @@ See also: [`racket-trim-requires`](#racket-trim-requires) and [`racket-base-requ
 
 ## racket-trim-requires
 
-
 Like [`racket-tidy-requires`](#racket-tidy-requires) but also deletes unused modules.
 
 Note: This only works when the source file can be evaluated with
@@ -226,7 +224,6 @@ file using `#lang`. It does *not* work for `require`s inside
 See also: [`racket-base-requires`](#racket-base-requires).
 
 ## racket-base-requires
-
 
 Change from `#lang racket` to `#lang racket/base`.
 
@@ -288,6 +285,7 @@ Note: Completion only finds symbols in the current namespace. You
 may need to [`racket-run`](#racket-run) the buffer, first.
 
 ## racket-indent-line
+
 Indent current line as Racket code.
 
 This behaves like `lisp-indent-line`, except that whole-line
@@ -350,7 +348,6 @@ Note: This requires Racket 6.1.1.6 or newer. Otherwise it won't
 error, it will just never return any matches.
 
 ## racket-find-collection
-
 
 Given a collection name, try to find its directory and files.
 
