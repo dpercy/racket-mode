@@ -55,7 +55,7 @@ http://www.gnu.org/licenses/ for details.")
   (racket--easy-keymap-define
    '(("<f5>"        racket-run)
      ("M-C-<f5>"    racket-racket)
-     ("C-<f5>"      racket-test)
+     ("C-<f5>"      racket-raco-test)
      ("M-C-x"       racket-send-definition)
      ("C-x C-e"     racket-send-last-sexp)
      ("C-c C-r"     racket-send-region)

@@ -474,7 +474,10 @@ existence using `fboundp'."
 Call `indent-for-tab-command'. If did not change the indentation
 or move point to `beginning-of-line-text', and if point is
 in/after at least 3 word/symbol characters, then call
-`completion-at-point'."
+`completion-at-point'.
+
+Note: Completion only finds symbols in the current namespace. You
+may need to `racket-run' the buffer, first."
   (interactive)
   (let ((pt (point)))
     (indent-for-tab-command)
