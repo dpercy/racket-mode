@@ -2,6 +2,7 @@
 
 - [Commands](#commands)
 - [Variables](#variables)
+
 ---
 
 ## Commands
@@ -500,7 +501,7 @@ noticeably slower. This is safe to set as a file-local variable.
 
 ### racket-pretty-lambda
 Display lambda keywords using λ. This is deprecated.
-Instead you can insert actual λ characters using \<racket-mode-map>\[racket-insert-lambda].
+Instead you can insert actual λ characters using C-M-y.
 
 ### racket-smart-open-bracket-enable
 Use [`racket-smart-open-bracket`](#racket-smart-open-bracket) when '[' is pressed?

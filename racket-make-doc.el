@@ -88,7 +88,7 @@
           (racket-make-doc/bindings-as-kbd symbol)
           (racket-make-doc/tweak-quotes
            (racket-make-doc/linkify
-            (or (documentation symbol nil)
+            (or (documentation symbol)
                 "No documentation.\n\n")))
           "\n\n"))
 
@@ -148,7 +148,7 @@
   (concat (format "### %s\n" symbol)
           (racket-make-doc/tweak-quotes
            (racket-make-doc/linkify
-            (or (documentation-property symbol 'variable-documentation t)
+            (or (documentation-property symbol 'variable-documentation)
                 "No documentation.\n\n")))
           "\n\n"))
 

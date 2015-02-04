@@ -39,7 +39,7 @@ deps:
 	$(BATCHEMACS) -eval '(progn (require (quote package)) (add-to-list (quote package-archives) (cons "melpa" "http://melpa.org/packages/")) (package-initialize) (package-refresh-contents) (package-install (quote dash)) (package-install (quote faceup)))'
 
 doc:
-	$(BATCHEMACS) -l racket-make-doc.el -f racket-make-doc/write-reference-file
+	$(BATCHEMACS) -eval '(progn (require (quote package)) (package-initialize))' -l racket-make-doc.el -f racket-make-doc/write-reference-file
 
 test: test-racket test-elisp
 
