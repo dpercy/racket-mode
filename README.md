@@ -55,7 +55,7 @@ You can install the `racket-mode` package from [MELPA].
 
 ## Configure
 
-See [Variables](reference.md#variables). You may set these directly in
+See [Variables](Reference.md#variables). You may set these directly in
 your Emacs init file (`~/.emacs` or `~/.emacs.d/init.el`), or, use
 <kbd>M-x Customize</kbd>, as you prefer.
 
@@ -90,7 +90,7 @@ to be an additional binding:
 
 ## Commands
 
-See the [Reference](reference.md).
+See the [Reference](Reference.md).
 
 
 Also see the `Racket` menu.
