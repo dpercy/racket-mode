@@ -99,6 +99,27 @@ Most of the commands should be self-explanatory. (If not,
 [report it][issues] and I'll improve the documentation.)
 
 
+## Contributing
+
+Run `make deps` to install the packages on which racket-mode depends.
+
+### Reference.md
+
+Reference.md is generated from doc strings.
+
+If you edit a doc string for a `defcustom` or a command (but don't
+worry about non-`interactive` `defun`s) then please `make doc` and
+commit the updated Reference.md.
+
+If you add a brand-new `defcustom` or command, then in addition to the
+preceding step, in `racket-make-doc.rkt` add the `defcustom` to the
+`racket-make-doc/variables` list or add the command to the
+`racket-make-doc/commands` list.
+
+### Tests
+
+Currently tests are on the light side, but more are welcome.
+
 ## Background/Motivation
 
 I started this project accidentally, while trying to figure out a

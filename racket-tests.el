@@ -1,15 +1,4 @@
 (require 'racket-mode)
-
-;; Ensure the faceup package is installed, e.g. on Travis CI.
-(require 'package)
-(add-to-list 'package-archives
-             '("melpa" . "http://melpa.milkbox.net/packages/") t)
-(package-initialize)
-(unless (package-installed-p 'faceup)
-  (condition-case ()
-      (package-install 'faceup)
-    (error (package-refresh-contents)
-           (package-install 'faceup))))
 (require 'faceup)
 
 (defconst racket-tests/here-dir (faceup-this-file-directory)

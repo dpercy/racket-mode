@@ -1,17 +1,7 @@
 
 ;;; Generate a markdown format file for Reference documentation.
 
-
-;; Ensure the dash package is installed, e.g. on Travis CI.
-(require 'package)
-(add-to-list 'package-archives
-             '("melpa" . "http://melpa.milkbox.net/packages/") t)
-(package-initialize)
-(unless (package-installed-p 'dash)
-  (condition-case ()
-      (package-install 'dash)
-    (error (package-refresh-contents)
-           (package-install 'dash))))
+(require 'racket-mode)
 (require 'dash)
 
 ;;; Top
@@ -23,7 +13,8 @@
 (defun racket-make-doc/write-reference-file ()
   (with-temp-buffer
     (insert (racket-make-doc/reference))
-    (write-file racket-make-doc/Reference.md nil)))
+    (let ((backup-inhibited t))
+      (write-file racket-make-doc/Reference.md nil))))
 
 
 (defun racket-make-doc/reference ()
