@@ -120,6 +120,9 @@ preceding step, in `racket-make-doc.rkt` add the `defcustom` to the
 
 Currently tests are on the light side, but more are welcome.
 
+Please do run `make test` to ensure you don't break the existing ones.
+Travis CI will also do this automatically on your pull request.
+
 ## Background/Motivation
 
 I started this project accidentally, while trying to figure out a
