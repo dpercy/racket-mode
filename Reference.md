@@ -1,14 +1,22 @@
-# racket-mode Reference
+# Reference
 
 - [Commands](#commands)
+    - [Run](#run)
+    - [Test](#test)
+    - [Eval](#eval)
+    - [Find code](#find-code)
+    - [Learn](#learn)
+    - [Edit](#edit)
+    - [Macro expand](#macro-expand)
 - [Variables](#variables)
+    - [General](#general)
+    - [REPL](#repl)
+    - [Other](#other)
 - [Faces](#faces)
-
----
 
 # Commands
 
-## Run, test, eval
+## Run
 
 ### racket-run
 <kbd>&lt;f5&gt;</kbd> or <kbd>C-c C-k</kbd>
@@ -62,6 +70,13 @@ Others are available only as a command in the REPL.
       not specified individually.
 
 
+### racket-racket
+<kbd>&lt;C-M-f5&gt;</kbd>
+
+Do `racket <file>` in `*shell*` buffer.
+
+## Test
+
 ### racket-test
 <kbd>&lt;C-f5&gt;</kbd>
 
@@ -72,16 +87,13 @@ See also:
 - [`racket-unfold-all-tests`](#racket-unfold-all-tests)
 
 
-### racket-racket
-<kbd>&lt;C-M-f5&gt;</kbd>
-
-Do `racket <file>` in `*shell*` buffer.
-
 ### racket-raco-test
 <kbd>M-x racket-raco-test</kbd>
 
 Do `raco test -x <file>` in `*shell*` buffer.
 To run <file>'s `test` submodule.
+
+## Eval
 
 ### racket-send-region
 <kbd>C-c C-r</kbd>
@@ -98,7 +110,7 @@ Send the current definition to the Racket REPL.
 
 Send the previous sexp to the Racket REPL.
 
-## Finding code
+## Find code
 
 ### racket-visit-definition
 <kbd>M-.</kbd>
@@ -177,7 +189,7 @@ Also handy is the `flx-ido` package from MELPA.
 
 See also: [`racket-visit-module`](#racket-visit-module) and [`racket-open-require-path`](#racket-open-require-path).
 
-## Describe and documentation
+## Learn
 
 ### racket-describe
 <kbd>C-c C-.</kbd>
@@ -223,7 +235,7 @@ variant of racket/help.)
 With a C-u prefix, prompts for the identifier or quoted string,
 instead of looking at point.
 
-## General editing
+## Edit
 
 ### racket-fold-all-tests
 <kbd>C-c C-f</kbd>
@@ -408,7 +420,7 @@ In an s-expression, move to the opening, and cycle the shape among () [] {}
 
 Like `backward-up-list` but also works when point is in a string literal.
 
-## Macro expansion
+## Macro expand
 
 ### racket-expand-region
 <kbd>C-c C-e r</kbd>
@@ -457,8 +469,6 @@ EXPERIMENTAL: May be changed or removed.
 
 BUGGY: The first-ever invocation might not display a GUI window.
 If so, try again.
-
----
 
 # Variables
 
@@ -531,8 +541,6 @@ Use [`racket-smart-open-bracket`](#racket-smart-open-bracket) when `[` is presse
 
 ### racket-use-company-mode
 Enable company-mode for racket-mode edit buffers?
-
----
 
 # Faces
 

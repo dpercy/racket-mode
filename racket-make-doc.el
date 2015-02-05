@@ -17,6 +17,7 @@
 
 (require 'racket-mode)
 (require 'dash)
+(require 's)
 
 ;;; Top
 
@@ -32,20 +33,13 @@
       (write-file racket-make-doc/Reference.md nil))))
 
 (defun racket-make-doc/reference ()
-  (concat "# racket-mode Reference\n"
-          "\n"
-          "- [Commands](#commands)\n"
-          "- [Variables](#variables)\n"
-          "- [Faces](#faces)\n"
-          "\n"
-          "---\n\n"
+  (concat "# Reference\n\n"
+          (racket-make-doc/toc)
           "# Commands\n\n"
           (racket-make-doc/commands)
-          "---\n\n"
           "# Variables\n\n"
           "> Note: You may also set these via Customize.\n\n"
           (racket-make-doc/variables)
-          "---\n\n"
           "# Faces\n\n"
           "> Note: You may also set these via Customize.\n\n"
           (racket-make-doc/faces)))
@@ -53,24 +47,26 @@
 ;;; Commands
 
 (defconst racket-make-doc/commands
-  '("Run, test, eval"
+  '("Run"
     racket-run
-    racket-test
     racket-racket
+    "Test"
+    racket-test
     racket-raco-test
+    "Eval"
     racket-send-region
     racket-send-definition
     racket-send-last-sexp
-    "Finding code"
+    "Find code"
     racket-visit-definition
     racket-visit-module
     racket-unvisit
     racket-open-require-path
     racket-find-collection
-    "Describe and documentation"
+    "Learn"
     racket-describe
     racket-doc
-    "General editing"
+    "Edit"
     racket-fold-all-tests
     racket-unfold-all-tests
     racket-tidy-requires
@@ -82,7 +78,7 @@
     racket-smart-open-bracket
     racket-cycle-paren-shapes
     racket-backward-up-list
-    "Macro expansion"
+    "Macro expand"
     racket-expand-region
     racket-expand-definition
     racket-expand-last-sexp
@@ -185,6 +181,26 @@
               racket-make-doc/linkify
               racket-make-doc/tweak-quotes)
           "\n\n"))
+
+;;; TOC
+
+(defun racket-make-doc/toc ()
+  (concat "- [Commands](#commands)\n"
+          (racket-make-doc/subheads racket-make-doc/commands)
+          "- [Variables](#variables)\n"
+          (racket-make-doc/subheads racket-make-doc/variables)
+          "- [Faces](#faces)\n"
+          "\n"))
+
+(defun racket-make-doc/subheads (xs)
+  (->> (-filter #'stringp xs)
+       (-map #'racket-make-doc/subhead)
+       (apply #'concat)))
+
+(defun racket-make-doc/subhead (x)
+  (format "    - [%s](#%s)\n"
+          x
+          (s-dashed-words x)))
 
 ;;; Utility
 
