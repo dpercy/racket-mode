@@ -56,7 +56,7 @@ from [MELPA]. <kbd>M-x package-install</kbd>, `racket-mode`.
 > **TIP**: To use MELPA add the following to your `~/.emacs` or
 > `~/.emacs.d/init.el`:
 >
-> ```cl
+> ```
 > (require 'package)
 > (add-to-list 'package-archives
 >              '("melpa" . "http://melpa.org/packages/")
