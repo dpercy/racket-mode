@@ -36,7 +36,7 @@ compile: clean \
 # deps automatically as a result of our Package-Requires in
 # racket-mode.el)
 deps:
-	$(BATCHEMACS) -eval '(progn (require (quote package)) (add-to-list (quote package-archives) (cons "melpa" "http://melpa.org/packages/")) (package-initialize) (package-refresh-contents) (package-install (quote dash)) (package-install (quote faceup)))'
+	$(BATCHEMACS) -eval '(progn (require (quote package)) (add-to-list (quote package-archives) (cons "melpa" "http://melpa.org/packages/")) (package-initialize) (package-refresh-contents) (package-install (quote dash)) (package-install (quote faceup)) (package-install (quote s)))'
 
 doc:
 	$(BATCHEMACS) -l racket-make-doc.el -f racket-make-doc/write-reference-file
