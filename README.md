@@ -30,6 +30,8 @@ major mode for a Racket REPL. The edit/run experience is similar to
 
 - Compatible with Emacs **24.3+**.
 
+- [More](Reference.md).
+
 ## Caveats
 
 - If you've used other Lisps and Schemes before, you might prefer
@@ -100,45 +102,21 @@ to be an additional binding:
             (define-key racket-mode-map (kbd "C-c r") 'racket-run)))
 ```
 
-## Commands
+## Documentation
 
-See the [Reference](Reference.md).
+Within Emacs, use the usual help functions.
+
+- Type <kbd>C-h m</kbd> to get help about the modes in effect for the
+  current buffer, including a list of key bindings and commands.
+
+- To see help about a specific command, for example `racket-run`, type
+  <kbd>C-h f</kbd> and then <kbd>racket-run</kbd>.
+
+Here on GitHub you can browse the [Reference](Reference.md).
 
 ## Contributing
 
-You can run `make deps` to install the packages on which racket-mode
-depends (currently `dash` and `faceup`).
-
-### Reference.md
-
-`Reference.md` is generated from doc strings for items specifically
-listed in `racket-make-doc.el`
-
-- If you add a brand-new command, `defcustom`, or `defface`, please
-  also add it to appropriate list.
-
-- If you edit a doc string for a command, `defcustom`, or `defface`,
-  please `make doc` and commit the updated `Reference.md`. (Although
-  this file is N/A for people _using_ racket-mode, it's useful to have
-  the features documented online.)
-
-### Tests
-
-Currently tests are on the light side. More are welcome.
-
-Please do run `make test` to ensure your changes pass the existing
-tests. Travis CI will also do this automatically on your pull request.
-
-#### Indentation
-
-If you change indentation, you may need to update the `example/*rkt`
-reference files used in tests.
-
-#### Font-lock
-
-If you change font-lock, you may need to use <kbd>M-x
-faceup-write-file</kbd> to regenerate the `example/*rkt.faceup`
-reference files used in tests.
+Pull requests are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Background/Motivation
 
