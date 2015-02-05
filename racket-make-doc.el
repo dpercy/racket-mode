@@ -86,27 +86,25 @@
 (defun racket-make-doc/command (symbol)
   (concat (format "### %s\n" symbol)
           (racket-make-doc/bindings-as-kbd symbol)
-          (racket-make-doc/tweak-quotes
-           (racket-make-doc/linkify
-            (or (documentation symbol)
-                "No documentation.\n\n")))
+          (-> (or (documentation symbol) "No documentation.\n\n")
+              racket-make-doc/linkify
+              racket-make-doc/tweak-quotes)
           "\n\n"))
 
 (defun racket-make-doc/bindings-as-kbd (symbol)
-  (let ((bindings (racket-make-doc/bindings symbol)))
-    (if bindings
-        (apply #'concat
-               (-snoc
-                (-interpose " or "
-                            (-non-nil
-                             (-map (lambda (binding)
-                                     (unless (eq (aref binding 0) 'menu-bar)
-                                       (format "<kbd>%s</kbd>"
-                                               (racket-make-doc/html-escape
-                                                (key-description binding)))))
-                                   bindings)))
-                 "\n\n"))
-      "\n")))
+  (let* ((bindings (racket-make-doc/bindings symbol))
+         (strs (and bindings
+                    (-non-nil
+                     (-map (lambda (binding)
+                             (unless (eq (aref binding 0) 'menu-bar)
+                               (format "<kbd>%s</kbd>"
+                                       (racket-make-doc/html-escape
+                                        (key-description binding)))))
+                           bindings))))
+         (str (if strs
+                  (apply #'concat (-interpose " or " strs))
+                (format "<kbd>M-x %s</kbd>" symbol))))
+    (concat str "\n\n")))
 
 (defun racket-make-doc/bindings (symbol)
   (where-is-internal symbol racket-mode-map))
@@ -146,10 +144,10 @@
 
 (defun racket-make-doc/variable (symbol)
   (concat (format "### %s\n" symbol)
-          (racket-make-doc/tweak-quotes
-           (racket-make-doc/linkify
-            (or (documentation-property symbol 'variable-documentation)
-                "No documentation.\n\n")))
+          (-> (or (documentation-property symbol 'variable-documentation)
+                  "No documentation.\n\n")
+              racket-make-doc/linkify
+              racket-make-doc/tweak-quotes)
           "\n\n"))
 
 ;;; Utility

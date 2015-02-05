@@ -46,8 +46,10 @@ Examples of such text include:
 - `print`s of `#<path>` objects.
 
 In the `*Racket REPL*` buffer you can issue some special
-commands. Some of them are the foundation for Emacs commands. Others
- are available only as a command in the REPL.
+commands. Some of them are the foundation for Emacs commands.
+Others are available only as a command in the REPL.
+
+- `,help`: See these commands.
 
 - `,top`: Reset the REPL to \"no file\" (i.e. a base namespace).
 
@@ -55,7 +57,7 @@ commands. Some of them are the foundation for Emacs commands. Others
   `\"file.rkt\"` is `file.rkt` OK.
 
 - `,doc <symbol-or-string>`: Look for `<symbol-or-string>` in
-  Racket's documentation. What `racket-doc'uses.
+  Racket's documentation. What `racket-doc' uses.
 
 - `,cd`, `,pwd`: Change and show [`current-directory`].
 

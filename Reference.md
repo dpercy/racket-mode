@@ -29,8 +29,10 @@ Examples of such text include:
 - `print`s of `#<path>` objects.
 
 In the `*Racket REPL*` buffer you can issue some special
-commands. Some of them are the foundation for Emacs commands. Others
- are available only as a command in the REPL.
+commands. Some of them are the foundation for Emacs commands.
+Others are available only as a command in the REPL.
+
+- `,help`: See these commands.
 
 - `,top`: Reset the REPL to "no file" (i.e. a base namespace).
 
@@ -38,7 +40,7 @@ commands. Some of them are the foundation for Emacs commands. Others
   `"file.rkt"` is `file.rkt` OK.
 
 - `,doc <symbol-or-string>`: Look for `<symbol-or-string>` in
-  Racket's documentation. What [`racket-doc`](#racket-doc)uses.
+  Racket's documentation. What [`racket-doc`](#racket-doc) uses.
 
 - `,cd`, `,pwd`: Change and show [`current-directory`].
 
@@ -73,7 +75,7 @@ See also:
 Do `racket <file>` in `*shell*` buffer.
 
 ### racket-raco-test
-
+<kbd>M-x racket-raco-test</kbd>
 
 Do `raco test -x <file>` in `*shell*` buffer.
 To run <file>'s `test` submodule.
@@ -200,6 +202,7 @@ Macro expand again the previous expansion done by one of:
 - [`racket-expand-again`](#racket-expand-again)
 
 ### racket-gui-macro-stepper
+<kbd>M-x racket-gui-macro-stepper</kbd>
 
 Run the DrRacket GUI macro stepper.
 
@@ -211,7 +214,7 @@ BUGGY: The first-ever invocation might not display a GUI window.
 If so, try again.
 
 ### racket-tidy-requires
-
+<kbd>M-x racket-tidy-requires</kbd>
 
 Make a single top-level `require`, modules sorted, one per line.
 
@@ -239,7 +242,7 @@ file using `#lang`. It does *not* work for `require`s inside
 See also: [`racket-trim-requires`](#racket-trim-requires) and [`racket-base-requires`](#racket-base-requires).
 
 ### racket-trim-requires
-
+<kbd>M-x racket-trim-requires</kbd>
 
 Like [`racket-tidy-requires`](#racket-tidy-requires) but also deletes unused modules.
 
@@ -253,7 +256,7 @@ file using `#lang`. It does *not* work for `require`s inside
 See also: [`racket-base-requires`](#racket-base-requires).
 
 ### racket-base-requires
-
+<kbd>M-x racket-base-requires</kbd>
 
 Change from `#lang racket` to `#lang racket/base`.
 
@@ -315,6 +318,7 @@ Note: Completion only finds symbols in the current namespace. You
 may need to [`racket-run`](#racket-run) the buffer, first.
 
 ### racket-indent-line
+<kbd>M-x racket-indent-line</kbd>
 
 Indent current line as Racket code.
 
@@ -378,7 +382,7 @@ Note: This requires Racket 6.1.1.6 or newer. Otherwise it won't
 error, it will just never return any matches.
 
 ### racket-find-collection
-
+<kbd>M-x racket-find-collection</kbd>
 
 Given a collection name, try to find its directory and files.
 
