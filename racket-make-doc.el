@@ -25,11 +25,10 @@
 
 (defun racket-make-doc/write-reference-file ()
   (interactive)
-  (with-temp-buffer
-    (insert (racket-make-doc/reference))
-    (let ((backup-inhibited t))
+  (let ((backup-inhibited t))
+    (with-temp-buffer
+      (insert (racket-make-doc/reference))
       (write-file racket-make-doc/Reference.md nil))))
-
 
 (defun racket-make-doc/reference ()
   (concat "# racket-mode Reference\n"
@@ -77,7 +76,8 @@
     racket-find-collection
     racket-smart-open-bracket
     racket-cycle-paren-shapes
-    racket-backward-up-list))
+    racket-backward-up-list)
+  "Commands to include in the Reference.")
 
 (defun racket-make-doc/commands ()
   (apply #'concat
@@ -136,7 +136,8 @@
     racket-use-company-mode
     racket-keyword-argument-face
     racket-paren-face
-    racket-selfeval-face))
+    racket-selfeval-face)
+  "Variables (and faces) to include in the Reference.")
 
 (defun racket-make-doc/variables ()
   (apply #'concat
@@ -145,6 +146,7 @@
 (defun racket-make-doc/variable (symbol)
   (concat (format "### %s\n" symbol)
           (-> (or (documentation-property symbol 'variable-documentation)
+                  (documentation-property symbol 'face-documentation)
                   "No documentation.\n\n")
               racket-make-doc/linkify
               racket-make-doc/tweak-quotes)

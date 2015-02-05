@@ -513,14 +513,11 @@ Use [`racket-smart-open-bracket`](#racket-smart-open-bracket) when '[' is presse
 Enable company-mode for racket-mode edit buffers?
 
 ### racket-keyword-argument-face
-No documentation.
-
-
+Face for #:keyword arguments.
 
 ### racket-paren-face
-No documentation.
-
-
+Face for parentheses () [] {}.
 
 ### racket-selfeval-face
-No documentation.
+Face for self-evaluating expressions like numbers, symbols, strings.
+
