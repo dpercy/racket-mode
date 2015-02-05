@@ -11,16 +11,15 @@ or, run `make deps`. The latter is also used by `.travis.yml`.
 
 # Reference.md
 
-`Reference.md` is generated from doc strings for items specifically
-listed in `racket-make-doc.el`
+Although `Reference.md` is N/A for people using racket-mode within
+Emacs, it is useful to have the features documented online, too. The
+file is is generated from doc strings.
 
 - If you add a brand-new command, `defcustom`, or `defface`, please
-  also add it to appropriate list.
+  also add it to appropriate list in `racket-make-doc.el`.
 
-- If you edit a doc string for a command, `defcustom`, or `defface`,
-  please `make doc` and commit the updated `Reference.md`. (Although
-  this file is N/A for people _using_ racket-mode, it's useful to have
-  the features documented online.)
+- Whenever you edit a doc string for a command, `defcustom`, or
+  `defface`, please `make doc` and commit the updated `Reference.md`.
 
 # Tests
 
@@ -31,11 +30,24 @@ tests. Travis CI will also do this automatically on your pull request.
 
 ## Indentation
 
-If you change indentation, you may need to update the `example/*rkt`
-reference files used in tests.
+Indentation is tested by comparing to a couple reference files,
+`example/*.rkt`.
+
+If you change indentation, you may need to refresh each reference
+file:
+
+1. Open it.
+2. Reindent it all
+    1. <kbd>C-x h</kbd>
+    2. <kbd>M-C-\\</kbd>
+3. Save it.
 
 ## Font-lock
 
-If you change font-lock, you may need to use <kbd>M-x
-faceup-write-file</kbd> to regenerate the `example/*rkt.faceup`
-reference files used in tests.
+Font-lock is tested by comparing to a couple reference files,
+`example/*.rkt.faceup`.
+
+If you change font-lock, you may need to refresh each reference file:
+
+1. Open it.
+2. <kbd>M-x faceup-write-file</kbd>
