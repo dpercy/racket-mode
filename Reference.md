@@ -6,7 +6,9 @@
 
 ---
 
-## Commands
+# Commands
+
+## Run, test, eval
 
 ### racket-run
 <kbd>&lt;f5&gt;</kbd> or <kbd>C-c C-k</kbd>
@@ -96,6 +98,8 @@ Send the current definition to the Racket REPL.
 
 Send the previous sexp to the Racket REPL.
 
+## Finding code
+
 ### racket-visit-definition
 <kbd>M-.</kbd>
 
@@ -130,6 +134,51 @@ See also: [`racket-find-collection`](#racket-find-collection).
 
 Return from previous [`racket-visit-definition`](#racket-visit-definition) or [`racket-visit-module`](#racket-visit-module).
 
+### racket-open-require-path
+<kbd>C-c C-x C-f</kbd>
+
+Like Dr Racket's Open Require Path.
+
+Type (or delete) characters that are part of a module path name.
+"Fuzzy" matches appear. For example try typing "t/t/r".
+
+Choices are displayed in a vertical list. The current choice is
+at the top, marked with "->".
+
+- C-n and C-p move among the choices.
+- RET on a directory adds its contents to the choices.
+- RET on a file exits doing `find-file`.
+- C-g aborts.
+
+Note: This requires Racket 6.1.1.6 or newer. Otherwise it won't
+error, it will just never return any matches.
+
+### racket-find-collection
+<kbd>M-x racket-find-collection</kbd>
+
+Given a collection name, try to find its directory and files.
+
+Takes a collection name from point (or, with a prefix, prompts you).
+
+If only one directory is found, `ido-find-file-in-dir` lets you
+pick a file there.
+
+If more than one directory is found, `ido-completing-read` lets
+you pick one, then `ido-find-file-in-dir` lets you pick a file
+there.
+
+Note: This requires the `raco-find-collection` package to be
+installed. To install it, in `shell` enter:
+
+    raco pkg install raco-find-collection
+
+Tip: This works best with `ido-enable-flex-matching` set to t.
+Also handy is the `flx-ido` package from MELPA.
+
+See also: [`racket-visit-module`](#racket-visit-module) and [`racket-open-require-path`](#racket-open-require-path).
+
+## Describe and documentation
+
 ### racket-describe
 <kbd>C-c C-.</kbd>
 
@@ -156,6 +205,26 @@ bottom of the buffer are Emacs buttons (which you may navigate among
 using <kbd>TAB</kbd> for visiting the definition or opening the full
 browser documentation (if any).
 
+### racket-doc
+<kbd>C-c C-d</kbd>
+
+View documentation of the identifier or string at point.
+
+Uses the default external web browser.
+
+If point is an identifier required in the current namespace that
+has help, opens the web browser directly at that help
+topic. (i.e. Uses the identifier variant of racket/help.)
+
+Otherwise, opens the 'search for a term' page, where you can
+choose among multiple possibilities. (i.e. Uses the string
+variant of racket/help.)
+
+With a C-u prefix, prompts for the identifier or quoted string,
+instead of looking at point.
+
+## General editing
+
 ### racket-fold-all-tests
 <kbd>C-c C-f</kbd>
 
@@ -165,54 +234,6 @@ Fold (hide) all test submodules.
 <kbd>C-c C-u</kbd>
 
 Unfold (show) all test submodules.
-
-### racket-expand-region
-<kbd>C-c C-e r</kbd>
-
-Like [`racket-send-region`](#racket-send-region), but macro expand.
-
-With C-u prefix, expands fully.
-
-Otherwise, expands once. You may use [`racket-expand-again`](#racket-expand-again).
-
-### racket-expand-definition
-<kbd>C-c C-e x</kbd>
-
-Like [`racket-send-definition`](#racket-send-definition), but macro expand.
-
-With C-u prefix, expands fully.
-
-Otherwise, expands once. You may use [`racket-expand-again`](#racket-expand-again).
-
-### racket-expand-last-sexp
-<kbd>C-c C-e e</kbd>
-
-Like [`racket-send-last-sexp`](#racket-send-last-sexp), but macro expand.
-
-With C-u prefix, expands fully.
-
-Otherwise, expands once. You may use [`racket-expand-again`](#racket-expand-again).
-
-### racket-expand-again
-<kbd>C-c C-e a</kbd>
-
-Macro expand again the previous expansion done by one of:
-- [`racket-expand-region`](#racket-expand-region)
-- [`racket-expand-definition`](#racket-expand-definition)
-- [`racket-expand-last-sexp`](#racket-expand-last-sexp)
-- [`racket-expand-again`](#racket-expand-again)
-
-### racket-gui-macro-stepper
-<kbd>M-x racket-gui-macro-stepper</kbd>
-
-Run the DrRacket GUI macro stepper.
-
-Runs on the active region, if any, else the entire buffer.
-
-EXPERIMENTAL: May be changed or removed.
-
-BUGGY: The first-ever invocation might not display a GUI window.
-If so, try again.
 
 ### racket-tidy-requires
 <kbd>M-x racket-tidy-requires</kbd>
@@ -282,24 +303,6 @@ Note: Currently this only helps change `#lang racket` to
 `#lang racket/base`. It does *not* help with other similar conversions,
 such as changing `#lang typed/racket` to `#lang typed/racket/base`.
 
-### racket-doc
-<kbd>C-c C-d</kbd>
-
-View documentation of the identifier or string at point.
-
-Uses the default external web browser.
-
-If point is an identifier required in the current namespace that
-has help, opens the web browser directly at that help
-topic. (i.e. Uses the identifier variant of racket/help.)
-
-Otherwise, opens the 'search for a term' page, where you can
-choose among multiple possibilities. (i.e. Uses the string
-variant of racket/help.)
-
-With a C-u prefix, prompts for the identifier or quoted string,
-instead of looking at point.
-
 ### racket-newline-and-indent
 <kbd>RET</kbd>
 
@@ -363,49 +366,6 @@ to this:
       blah)
 
 
-### racket-open-require-path
-<kbd>C-c C-x C-f</kbd>
-
-Like Dr Racket's Open Require Path.
-
-Type (or delete) characters that are part of a module path name.
-"Fuzzy" matches appear. For example try typing "t/t/r".
-
-Choices are displayed in a vertical list. The current choice is
-at the top, marked with "->".
-
-- C-n and C-p move among the choices.
-- RET on a directory adds its contents to the choices.
-- RET on a file exits doing `find-file`.
-- C-g aborts.
-
-Note: This requires Racket 6.1.1.6 or newer. Otherwise it won't
-error, it will just never return any matches.
-
-### racket-find-collection
-<kbd>M-x racket-find-collection</kbd>
-
-Given a collection name, try to find its directory and files.
-
-Takes a collection name from point (or, with a prefix, prompts you).
-
-If only one directory is found, `ido-find-file-in-dir` lets you
-pick a file there.
-
-If more than one directory is found, `ido-completing-read` lets
-you pick one, then `ido-find-file-in-dir` lets you pick a file
-there.
-
-Note: This requires the `raco-find-collection` package to be
-installed. To install it, in `shell` enter:
-
-    raco pkg install raco-find-collection
-
-Tip: This works best with `ido-enable-flex-matching` set to t.
-Also handy is the `flx-ido` package from MELPA.
-
-See also: [`racket-visit-module`](#racket-visit-module) and [`racket-open-require-path`](#racket-open-require-path).
-
 ### racket-smart-open-bracket
 <kbd>[</kbd>
 
@@ -448,11 +408,63 @@ In an s-expression, move to the opening, and cycle the shape among () [] {}
 
 Like `backward-up-list` but also works when point is in a string literal.
 
+## Macro expansion
+
+### racket-expand-region
+<kbd>C-c C-e r</kbd>
+
+Like [`racket-send-region`](#racket-send-region), but macro expand.
+
+With C-u prefix, expands fully.
+
+Otherwise, expands once. You may use [`racket-expand-again`](#racket-expand-again).
+
+### racket-expand-definition
+<kbd>C-c C-e x</kbd>
+
+Like [`racket-send-definition`](#racket-send-definition), but macro expand.
+
+With C-u prefix, expands fully.
+
+Otherwise, expands once. You may use [`racket-expand-again`](#racket-expand-again).
+
+### racket-expand-last-sexp
+<kbd>C-c C-e e</kbd>
+
+Like [`racket-send-last-sexp`](#racket-send-last-sexp), but macro expand.
+
+With C-u prefix, expands fully.
+
+Otherwise, expands once. You may use [`racket-expand-again`](#racket-expand-again).
+
+### racket-expand-again
+<kbd>C-c C-e a</kbd>
+
+Macro expand again the previous expansion done by one of:
+- [`racket-expand-region`](#racket-expand-region)
+- [`racket-expand-definition`](#racket-expand-definition)
+- [`racket-expand-last-sexp`](#racket-expand-last-sexp)
+- [`racket-expand-again`](#racket-expand-again)
+
+### racket-gui-macro-stepper
+<kbd>M-x racket-gui-macro-stepper</kbd>
+
+Run the DrRacket GUI macro stepper.
+
+Runs on the active region, if any, else the entire buffer.
+
+EXPERIMENTAL: May be changed or removed.
+
+BUGGY: The first-ever invocation might not display a GUI window.
+If so, try again.
+
 ---
 
-## Variables
+# Variables
 
 > Note: You may also set these via Customize.
+
+## General
 
 ### racket-racket-program
 Pathname of the racket executable.
@@ -468,6 +480,8 @@ Caveat: This uses Racket's `custodian-limit-memory`, which does
 not enforce the limit exactly. Instead, the program will be
 terminated upon the first garbage collection where memory exceeds
 the limit (maybe by a significant amount).
+
+## REPL
 
 ### racket-history-filter-regexp
 Input matching this regexp are not saved on the history list.
@@ -488,6 +502,8 @@ Use pretty-print instead of print in REPL.
 
 ### racket-wait-for-prompt-timeout
 When REPL starts Racket process, how long to wait for Racket prompt.
+
+## Other
 
 ### racket-indent-curly-as-sequence
 Indent `{}` with items aligned with the head item?
@@ -518,7 +534,7 @@ Enable company-mode for racket-mode edit buffers?
 
 ---
 
-## Faces
+# Faces
 
 > Note: You may also set these via Customize.
 

@@ -1,3 +1,4 @@
+;; -*- lexical: t; -*-
 ;;; racket-make-doc.el --- Major mode for Racket language.
 
 ;; Copyright (c) 2013-2015 by Greg Hendershott.
@@ -38,63 +39,70 @@
           "- [Faces](#faces)\n"
           "\n"
           "---\n\n"
-          "## Commands\n\n"
+          "# Commands\n\n"
           (racket-make-doc/commands)
           "---\n\n"
-          "## Variables\n\n"
+          "# Variables\n\n"
           "> Note: You may also set these via Customize.\n\n"
           (racket-make-doc/variables)
           "---\n\n"
-          "## Faces\n\n"
+          "# Faces\n\n"
           "> Note: You may also set these via Customize.\n\n"
           (racket-make-doc/faces)))
 
 ;;; Commands
 
 (defconst racket-make-doc/commands
-  '(racket-run
+  '("Run, test, eval"
+    racket-run
     racket-test
     racket-racket
     racket-raco-test
     racket-send-region
     racket-send-definition
     racket-send-last-sexp
+    "Finding code"
     racket-visit-definition
     racket-visit-module
     racket-unvisit
+    racket-open-require-path
+    racket-find-collection
+    "Describe and documentation"
     racket-describe
+    racket-doc
+    "General editing"
     racket-fold-all-tests
     racket-unfold-all-tests
+    racket-tidy-requires
+    racket-trim-requires
+    racket-base-requires
+    racket-newline-and-indent
+    racket-indent-or-complete
+    racket-indent-line
+    racket-smart-open-bracket
+    racket-cycle-paren-shapes
+    racket-backward-up-list
+    "Macro expansion"
     racket-expand-region
     racket-expand-definition
     racket-expand-last-sexp
     racket-expand-again
-    racket-gui-macro-stepper
-    racket-tidy-requires
-    racket-trim-requires
-    racket-base-requires
-    racket-doc
-    racket-newline-and-indent
-    racket-indent-or-complete
-    racket-indent-line
-    racket-open-require-path
-    racket-find-collection
-    racket-smart-open-bracket
-    racket-cycle-paren-shapes
-    racket-backward-up-list)
+    racket-gui-macro-stepper)
   "Commands to include in the Reference.")
 
 (defun racket-make-doc/commands ()
   (apply #'concat
-         (mapcar #'racket-make-doc/command racket-make-doc/commands)))
+         (-map #'racket-make-doc/command racket-make-doc/commands)))
 
-(defun racket-make-doc/command (symbol)
-  (concat (format "### %s\n" symbol)
-          (racket-make-doc/bindings-as-kbd symbol)
-          (-> (or (documentation symbol) "No documentation.\n\n")
-              racket-make-doc/linkify
-              racket-make-doc/tweak-quotes)
-          "\n\n"))
+(defun racket-make-doc/command (s)
+  (if (stringp s)
+      (format "## %s\n\n" s)
+    (concat (format "### %s\n" s)
+            (racket-make-doc/bindings-as-kbd s)
+            (-> (or (documentation s) "No documentation.\n\n")
+                racket-make-doc/linkify
+                racket-make-doc/tweak-quotes)
+            "\n\n")))
 
 (defun racket-make-doc/bindings-as-kbd (symbol)
   (let* ((bindings (racket-make-doc/bindings symbol))
@@ -125,15 +133,18 @@
 ;;; Variables
 
 (defconst racket-make-doc/variables
-  '(racket-racket-program
+  '("General"
+    racket-racket-program
     racket-raco-program
     racket-memory-limit
+    "REPL"
     racket-history-filter-regexp
     racket-images-inline
     racket-images-keep-last
     racket-images-system-viewer
     racket-pretty-print
     racket-wait-for-prompt-timeout
+    "Other"
     racket-indent-curly-as-sequence
     racket-indent-sequence-depth
     racket-pretty-lambda
@@ -145,15 +156,17 @@
   (apply #'concat
          (mapcar #'racket-make-doc/variable racket-make-doc/variables)))
 
-(defun racket-make-doc/variable (symbol)
-  (concat (format "### %s\n" symbol)
-          (-> (or (documentation-property symbol 'variable-documentation)
-                  "No documentation.\n\n")
-              racket-make-doc/linkify
-              racket-make-doc/tweak-quotes)
-          "\n\n"))
+(defun racket-make-doc/variable (s)
+  (if (stringp s)
+      (format "## %s\n\n" s)
+    (concat (format "### %s\n" s)
+            (-> (or (documentation-property s 'variable-documentation)
+                    "No documentation.\n\n")
+                racket-make-doc/linkify
+                racket-make-doc/tweak-quotes)
+            "\n\n")))
 
-;;; Variables
+;;; Faces
 
 (defconst racket-make-doc/faces
   '(racket-keyword-argument-face
