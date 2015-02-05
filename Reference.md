@@ -2,6 +2,7 @@
 
 - [Commands](#commands)
 - [Variables](#variables)
+- [Faces](#faces)
 
 ---
 
@@ -511,6 +512,12 @@ Use [`racket-smart-open-bracket`](#racket-smart-open-bracket) when '[' is presse
 
 ### racket-use-company-mode
 Enable company-mode for racket-mode edit buffers?
+
+---
+
+## Faces
+
+> Note: You may also set these via Customize.
 
 ### racket-keyword-argument-face
 Face for #:keyword arguments.

@@ -35,6 +35,7 @@
           "\n"
           "- [Commands](#commands)\n"
           "- [Variables](#variables)\n"
+          "- [Faces](#faces)\n"
           "\n"
           "---\n\n"
           "## Commands\n\n"
@@ -42,7 +43,11 @@
           "---\n\n"
           "## Variables\n\n"
           "> Note: You may also set these via Customize.\n\n"
-          (racket-make-doc/variables)))
+          (racket-make-doc/variables)
+          "---\n\n"
+          "## Faces\n\n"
+          "> Note: You may also set these via Customize.\n\n"
+          (racket-make-doc/faces)))
 
 ;;; Commands
 
@@ -133,11 +138,8 @@
     racket-indent-sequence-depth
     racket-pretty-lambda
     racket-smart-open-bracket-enable
-    racket-use-company-mode
-    racket-keyword-argument-face
-    racket-paren-face
-    racket-selfeval-face)
-  "Variables (and faces) to include in the Reference.")
+    racket-use-company-mode)
+  "Variables to include in the Reference.")
 
 (defun racket-make-doc/variables ()
   (apply #'concat
@@ -146,7 +148,26 @@
 (defun racket-make-doc/variable (symbol)
   (concat (format "### %s\n" symbol)
           (-> (or (documentation-property symbol 'variable-documentation)
-                  (documentation-property symbol 'face-documentation)
+                  "No documentation.\n\n")
+              racket-make-doc/linkify
+              racket-make-doc/tweak-quotes)
+          "\n\n"))
+
+;;; Variables
+
+(defconst racket-make-doc/faces
+  '(racket-keyword-argument-face
+    racket-paren-face
+    racket-selfeval-face)
+  "Faces to include in the Reference.")
+
+(defun racket-make-doc/faces ()
+  (apply #'concat
+         (mapcar #'racket-make-doc/face racket-make-doc/faces)))
+
+(defun racket-make-doc/face (symbol)
+  (concat (format "### %s\n" symbol)
+          (-> (or (documentation-property symbol 'face-documentation)
                   "No documentation.\n\n")
               racket-make-doc/linkify
               racket-make-doc/tweak-quotes)
