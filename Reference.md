@@ -409,9 +409,13 @@ See also: [`racket-visit-module`](#racket-visit-module) and [`racket-open-requir
 ### racket-smart-open-bracket
 <kbd>[</kbd>
 
-Automatically insert a '(' or a '[' as appropriate.
+Automatically insert a `(` or a `[` as appropriate.
 
-By default, inserts a '('. Inserts a '[' in the following cases:
+When [`racket-smart-open-bracket-enable`](#racket-smart-open-bracket-enable) is nil, this simply
+inserts `[`. Otherwise, this behaves like the "Automatically
+adjust opening square brackets" feature in Dr. Racket:
+
+By default, inserts a `(`. Inserts a `[` in the following cases:
 
   - `let`-like bindings -- forms with `let` in the name as well
     as things like `parameterize`, `with-handlers`, and
@@ -422,21 +426,17 @@ By default, inserts a '('. Inserts a '[' in the following cases:
 
   - `for`-like bindings and `for/fold` accumulators.
 
-To force insert '[', use `quoted-insert`: C-q [.
-
 When the previous s-expression in a sequence is a compound
 expression, uses the same kind of delimiter.
 
-Combined with [`racket-insert-closing-bracket`](#racket-insert-closing-bracket), this means that
-you can press the unshifted '[' and ']' keys to get whatever
-delimiters follow the Racket conventions for these forms. (When
-`paredit-mode` is active, you need not even press ']'; this
-command calls `paredit-open-round` or `paredit-open-square` to
-work as usual.)
+To force insert `[`, use `quoted-insert`: C-q [.
 
-To disable: Customize [`racket-smart-open-bracket-enable`](#racket-smart-open-bracket-enable). This is
-like the 'Automatically adjust opening square brackets'
-preference in Dr. Racket.
+Combined with [`racket-insert-closing-bracket`](#racket-insert-closing-bracket), this means that
+you can press the unshifted `[` and `]` keys to get whatever
+delimiters follow the Racket conventions for these forms. (When
+`paredit-mode` is active, you need not even press `]`. This calls
+`paredit-open-round` or `paredit-open-square` so that paredit
+will work as usual.)
 
 ### racket-cycle-paren-shapes
 <kbd>C-c C-p</kbd>
@@ -464,8 +464,8 @@ Pathname of the raco executable.
 Terminate the Racket process if memory use exceeds this value in MB.
 Changes to this value take effect upon the next [`racket-run`](#racket-run).
 
-Caveat: This uses Racket's custodian-limit-memory, which doesn't
-enforce the limit exactly. Instead, the program will be
+Caveat: This uses Racket's `custodian-limit-memory`, which does
+not enforce the limit exactly. Instead, the program will be
 terminated upon the first garbage collection where memory exceeds
 the limit (maybe by a significant amount).
 
@@ -490,25 +490,28 @@ Use pretty-print instead of print in REPL.
 When REPL starts Racket process, how long to wait for Racket prompt.
 
 ### racket-indent-curly-as-sequence
-Indent {} with items aligned with the head item?
+Indent `{}` with items aligned with the head item?
 This is indirectly disabled if [`racket-indent-sequence-depth`](#racket-indent-sequence-depth) is 0.
 This is safe to set as a file-local variable.
 
 ### racket-indent-sequence-depth
 To what depth should [`racket--align-sequence-to-head`](#racket--align-sequence-to-head) search.
-This affects the indentation of forms like '() `() #() -- and {}
-if [`racket-indent-curly-as-sequence`](#racket-indent-curly-as-sequence) is t -- but not #'() #`()
-,() ,@(). A zero value disables, giving the normal indent
-behavior of DrRacket or Emacs `lisp-mode` derived modes like
-`scheme-mode`. Setting this to a high value can make indentation
-noticeably slower. This is safe to set as a file-local variable.
+This affects the indentation of forms like `` '()` `() #() `` --
+and `{}` if [`racket-indent-curly-as-sequence`](#racket-indent-curly-as-sequence) is t -- but not
+`` #'() #`() ,() ,@() ``. A zero value disables, giving the
+normal indent behavior of DrRacket or Emacs `lisp-mode` derived
+modes like `scheme-mode`. Setting this to a high value can make
+indentation noticeably slower. This is safe to set as a
+file-local variable.
 
 ### racket-pretty-lambda
 Display lambda keywords using λ. This is deprecated.
-Instead you can insert actual λ characters using C-M-y.
+Instead you can insert actual λ characters using
+C-M-y
+[`racket-insert-lambda`](#racket-insert-lambda).
 
 ### racket-smart-open-bracket-enable
-Use [`racket-smart-open-bracket`](#racket-smart-open-bracket) when '[' is pressed?
+Use [`racket-smart-open-bracket`](#racket-smart-open-bracket) when `[` is pressed?
 
 ### racket-use-company-mode
 Enable company-mode for racket-mode edit buffers?
@@ -520,10 +523,10 @@ Enable company-mode for racket-mode edit buffers?
 > Note: You may also set these via Customize.
 
 ### racket-keyword-argument-face
-Face for #:keyword arguments.
+Face for `#:keyword` arguments.
 
 ### racket-paren-face
-Face for parentheses () [] {}.
+Face for `() [] {}`.
 
 ### racket-selfeval-face
 Face for self-evaluating expressions like numbers, symbols, strings.
