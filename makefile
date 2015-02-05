@@ -1,6 +1,6 @@
 EMACS=$(shell if [ -z "`which emacs`" ]; then echo "Emacs executable not found"; exit 1; else echo emacs; fi)
 
-BATCHEMACS=${EMACS} --batch --no-site-file -q -eval '(progn (add-to-list (quote load-path) "${PWD}/") (require (quote package)) (package-initialize))'
+BATCHEMACS=${EMACS} --batch --no-site-file -q -eval '(progn (add-to-list (quote load-path) "${PWD}/") (package-initialize))'
 
 BYTECOMP = $(BATCHEMACS) -eval '(progn (require (quote bytecomp)) (setq byte-compile-warnings t) (setq byte-compile-error-on-warn t))' -f batch-byte-compile
 
@@ -36,7 +36,7 @@ compile: clean \
 # deps automatically as a result of our Package-Requires in
 # racket-mode.el)
 deps:
-	$(BATCHEMACS) -eval '(progn (require (quote package)) (add-to-list (quote package-archives) (cons "melpa" "http://melpa.org/packages/")) (package-initialize) (package-refresh-contents) (package-install (quote dash)) (package-install (quote faceup)) (package-install (quote s)))'
+	$(BATCHEMACS) -eval '(progn (add-to-list (quote package-archives) (cons "melpa" "http://melpa.org/packages/")) (package-initialize) (package-refresh-contents) (package-install (quote dash)) (package-install (quote faceup)) (package-install (quote s)))'
 
 doc:
 	$(BATCHEMACS) -l racket-make-doc.el -f racket-make-doc/write-reference-file
