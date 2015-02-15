@@ -425,6 +425,27 @@ In an s-expression, move to the opening, and cycle the shape among () [] {}
 
 Like `backward-up-list` but also works when point is in a string literal.
 
+### racket-check-syntax-mode
+<kbd>M-x racket-check-syntax-mode</kbd>
+
+Analyze the buffer and annotate with information.
+
+The buffer becomes read-only until you exit this minor mode.
+However you may navigate the usual ways. When point is on a
+definition or usage, related items are highlighted and
+information is displayed in the status line. You may also use
+special commands to navigate among the definition and its usages.
+
+key             binding
+---             -------
+
+.		racket-check-syntax-mode-goto-def
+n		racket-check-syntax-mode-goto-next-use
+p		racket-check-syntax-mode-goto-prev-use
+q		racket-check-syntax-mode-quit
+
+
+
 ## Macro expand
 
 ### racket-expand-region
