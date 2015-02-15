@@ -179,7 +179,7 @@ Instead you can insert actual λ characters using
 (defconst racket-check-syntax-def-face 'racket-check-syntax-def-face)
 (defface racket-check-syntax-def-face
   '((t
-     (:background "LightGreen")))
+     (:foreground "Black" :background "SeaGreen1" :weight bold)))
   "Face `racket-check-syntax' uses to highlight definitions."
   :tag "Check Syntax Def Face"
   :group 'racket-faces)
@@ -187,7 +187,7 @@ Instead you can insert actual λ characters using
 (defconst racket-check-syntax-use-face 'racket-check-syntax-use-face)
 (defface racket-check-syntax-use-face
   '((t
-     (:background "Green")))
+     (:foreground "Black" :background "PaleGreen1" :slant italic)))
   "Face `racket-check-syntax' uses to highlight uses."
   :tag "Check Syntax Use Face"
   :group 'racket-faces)

@@ -552,22 +552,40 @@
 ;;; check-syntax
 
 (define check-syntax
-  (let ([show-content (try (dynamic-require 'drracket/check-syntax
-                                            'show-content)
-                           #:catch exn:fail? _ (λ _ '()))])
+  (let* ([show-content (try (let ([f (dynamic-require 'drracket/check-syntax
+                                                      'show-content)])
+                              ;; Ensure correct position info for
+                              ;; Unicode like λ. show-content probably
+                              ;; ought to do this itself, but work
+                              ;; around that.
+                              (λ (path)
+                                (parameterize ([port-count-lines-enabled #t])
+                                  (f path))))
+                            #:catch exn:fail? _ (λ _ '()))])
     (λ (path)
-      (elisp-println (adjust-paths (show-content path))))))
+      (define xs
+        (remove-duplicates
+         (filter
+          values
+          (for/list ([x (in-list (show-content path))])
+            (match x
+              [(vector 'syncheck:add-arrow/name-dup
+                       beg-def end-def beg-use end-use actual? phase req? _)
+               (list 'arrow beg-def end-def beg-use end-use)]
+              [(vector 'syncheck:add-mouse-over-status beg end str)
+               (list 'info beg end str)]
+              [_ #f])))))
+      ;;(pretty-print xs)
+      (elisp-println xs))))
 
 (define (adjust-paths x)
-  ;; 1. Convert all paths to path-strings.
-  ;; 2. Convert the vectors to lists.
+  ;; Convert all paths to path-strings.
   (let loop ([x x])
     (match x
       [(? pair? x) (cons (loop (car x)) (loop (cdr x)))]
-      [(? vector? x) (for/list ([x (in-vector x)])
+      [(? vector? x) (for/vector ([x (in-vector x)])
                        (loop x))]
       [(? path? x) (path->string x)]
-      ['#%kernel 'kernel] ;#\# not legal in Elisp
       [(? procedure?) null]
       [_ x])))
 
