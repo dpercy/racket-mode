@@ -58,6 +58,7 @@
            [(requires/trim) (requires/trim (read) (read))]
            [(requires/base) (requires/base (read) (read))]
            [(find-collection) (find-collection (read))]
+           [(check-syntax) (check-syntax path)]
            [(exit) (exit)]
            [else (usage)])]
         [_ stx]))))
@@ -547,6 +548,28 @@
     [f  (map path->string (f str))]))
 
 (define find-collection (compose elisp-println do-find-collection))
+
+;;; check-syntax
+
+(define check-syntax
+  (let ([show-content (try (dynamic-require 'drracket/check-syntax
+                                            'show-content)
+                           #:catch exn:fail? _ (λ _ '()))])
+    (λ (path)
+      (elisp-println (adjust-paths (show-content path))))))
+
+(define (adjust-paths x)
+  ;; 1. Convert all paths to path-strings.
+  ;; 2. Convert the vectors to lists.
+  (let loop ([x x])
+    (match x
+      [(? pair? x) (cons (loop (car x)) (loop (cdr x)))]
+      [(? vector? x) (for/list ([x (in-vector x)])
+                       (loop x))]
+      [(? path? x) (path->string x)]
+      ['#%kernel 'kernel] ;#\# not legal in Elisp
+      [(? procedure?) null]
+      [_ x])))
 
 ;; Local Variables:
 ;; coding: utf-8

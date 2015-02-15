@@ -19,6 +19,7 @@
 ;; racket-mode per se, i.e. the .rkt file buffers
 
 (require 'cl-lib)
+(require 'dash)
 (require 'racket-custom)
 (require 'racket-common)
 (require 'racket-complete)
@@ -586,6 +587,100 @@ instead of textually, and handle module and submodule forms."
           (kill-sexp -1)
           (delete-blank-lines)))
       (list first-beg requires))))
+
+
+;;; racket-check-syntax
+
+(defun racket--highlight (beg end defp)
+  (let ((o (make-overlay beg end)))
+    (overlay-put o 'name 'check-syntax-highlight)
+    (overlay-put o 'priority 100)
+    (overlay-put o 'face (if defp
+                             racket-check-syntax-use-face
+                           racket-check-syntax-def-face))))
+
+(defun racket--unhighlight-all ()
+  (remove-overlays (point-min) (point-max) 'check-syntax-highlight))
+
+(defun racket--point-entered (old new)
+  (-when-let (s (get-text-property new 'help-echo))
+    (message s))
+  (-when-let (uses (get-text-property new 'arrow-def))
+    ;; Fastest way to find extent of this def is to look at its first use,
+    ;; and get the 'arrow-use property which has the def's beg/end.
+    (-let [(beg end) (car uses)]
+      (-when-let (def (get-text-property beg 'arrow-use))
+        (-let [(beg end) def]
+          (racket--highlight beg end t))))
+    (dolist (use uses)
+      (-let [(beg end) use]
+        (racket--highlight beg end nil))))
+  (-when-let (def (get-text-property new 'arrow-use))
+    (-let [(beg end) def]
+      (racket--highlight beg end t)
+      (-when-let (uses (get-text-property beg 'arrow-def))
+        (dolist (use uses)
+          (-let [(beg end) use]
+            (racket--highlight beg end nil)))))))
+
+(defun racket--point-left (old new)
+  (racket--unhighlight-all))
+
+(defun racket-check-syntax ()
+  "Annotate source code."
+  (interactive)
+  (racket-uncheck-syntax)
+  (let ((result (racket--eval/sexpr (format ",check-syntax\n\n"))))
+    (if result
+        (with-silent-modifications
+         (dolist (x result)
+           (cond ((eq (nth 0 x) 'syncheck:add-mouse-over-status)
+                  (put-text-property (1+ (nth 1 x)) (1+ (nth 2 x))
+                                     'help-echo (nth 3 x)))
+                 ((eq (nth 0 x) 'syncheck:add-arrow/name-dup)
+                  (let* ((def-beg (1+ (nth 1 x)))
+                         (def-end (1+ (nth 2 x)))
+                         (use-beg (1+ (nth 3 x)))
+                         (use-end (1+ (nth 4 x))))
+                    (put-text-property def-beg def-end
+                                       'arrow-def
+                                       ;; Def may have multiple
+                                       ;; arrows outward, so append
+                                       ;; this to any already there.
+                                       (cons (list use-beg use-end)
+                                             (get-text-property def-beg
+                                                                'arrow-def)))
+                    (put-text-property def-beg def-end
+                                       'point-entered
+                                       #'racket--point-entered)
+                    (put-text-property def-beg def-end
+                                       'point-left
+                                       #'racket--point-left)
+                    (put-text-property use-beg use-end
+                                       'arrow-use
+                                       (list def-beg def-end))
+                    (put-text-property use-beg use-end
+                                       'point-entered
+                                       #'racket--point-entered)
+                    (put-text-property use-beg use-end
+                                       'point-left
+                                       #'racket--point-left)))))
+         (setq buffer-read-only t)
+         (message "Move to see bindings. M-x racket-check-syntax-stop to quit."))
+      (error "Requires a newer version of Racket."))))
+
+(defun racket-check-syntax-stop ()
+  (interactive)
+  (with-silent-modifications
+    (remove-text-properties (point-min)
+                            (point-max)
+                            '(help-echo nil
+                              arrow-def nil
+                              arrow-use nil
+                              point-entered
+                              point-left))
+    (racket--unhighlight-all)
+    (setq buffer-read-only nil)))
 
 
 ;;; misc
