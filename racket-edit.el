@@ -626,16 +626,63 @@ instead of textually, and handle module and submodule forms."
 (defun racket--point-left (old new)
   (racket--unhighlight-all))
 
+(defun racket-check-syntax-mode-quit ()
+  (interactive)
+  (racket-check-syntax-mode -1))
+
+(defun racket-check-syntax-mode-goto-def ()
+  "When point is on a usage, go to its definition."
+  (interactive)
+  (-when-let (def (get-text-property (point) 'racket-check-syntax-use))
+    (-let [(beg end) def]
+      (goto-char beg))))
+
+(defun racket-check-syntax-mode-forward-use (amt)
+  "When point is on a usage, go AMT usages forward. AMT may be negative.
+If point is instead on a definition, then go to its first usage."
+  (-if-let (def (get-text-property (point) 'racket-check-syntax-use))
+      (-let (((beg end) def))
+        (-when-let (uses (get-text-property beg 'racket-check-syntax-def))
+          (let* ((ix-this (-find-index (lambda (use)
+                                         (-let (((beg end) use)
+                                                (pt (point)))
+                                           ;;(debug beg end pt)
+                                           (and (<= beg pt) (< pt end))))
+                                       uses))
+                 (ix-next (+ ix-this amt))
+                 (ix-next (cond ((> amt 0)
+                                 (if (>= ix-next (length uses)) 0 ix-next))
+                                (t
+                                 (if (< ix-next 0) (1- (length uses)) ix-next))))
+                 (next (nth ix-next uses)))
+            (goto-char (car next)))))
+    ;; When on a definition, simply go to its first usage.
+    (-when-let (uses (get-text-property (point) 'racket-check-syntax-def))
+      (goto-char (car (car uses))))))
+
+(defun racket-check-syntax-mode-goto-next-use ()
+  "When point is on a usage, go to the next (sibling) usage."
+  (interactive)
+  (racket-check-syntax-mode-forward-use 1))
+
+(defun racket-check-syntax-mode-goto-prev-use ()
+  "When point is on a usage, go to the previous (sibling) usage."
+  (interactive)
+  (racket-check-syntax-mode-forward-use -1))
+
 (define-minor-mode racket-check-syntax-mode
   "Analyze the buffer and annotate with information.
 
 \\{racket-check-syntax-mode-map}"
   :lighter " CheckSyntax"
-  :keymap '(("q" . (lambda () (interactive) (racket-check-syntax-mode -1))))
-  ;; TODO: Add bindings/commands for navigating among a def and its use(s).
+  :keymap '(("q" . racket-check-syntax-mode-quit)
+            ("." . racket-check-syntax-mode-goto-def)
+            ("n" . racket-check-syntax-mode-goto-next-use)
+            ("p" . racket-check-syntax-mode-goto-prev-use))
 
   (racket--check-syntax-stop)
   (when racket-check-syntax-mode
+    ;; TODO: Check that current buffer is racket-mode?
     (racket--check-syntax-start)))
 
 (defun racket--check-syntax-start ()
@@ -659,10 +706,12 @@ instead of textually, and handle module and submodule forms."
              ;; Properties for the definition
              (put-text-property def-beg def-end
                                 'racket-check-syntax-def
-                                (cons (list use-beg use-end)
-                                      (get-text-property
-                                       def-beg
-                                       'racket-check-syntax-def)))
+                                (sort
+                                 (cons (list use-beg use-end)
+                                       (get-text-property
+                                        def-beg
+                                        'racket-check-syntax-def))
+                                 (lambda (a b) (< (car a) (car b)))))
              (put-text-property def-beg def-end
                                 'point-entered
                                 #'racket--point-entered)
@@ -681,7 +730,7 @@ instead of textually, and handle module and submodule forms."
                                 #'racket--point-left)))))
       (setq buffer-read-only t)
       (racket--point-entered (point-min) (point))
-      (message "Move to see bindings. Press q to quit."))))
+      (message "Move to see bindings. Buffer is read-only. Press q to quit."))))
 
 (defun racket--check-syntax-stop ()
   (with-silent-modifications
