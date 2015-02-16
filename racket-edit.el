@@ -670,25 +670,32 @@ If point is instead on a definition, then go to its first usage."
   (interactive)
   (racket-check-syntax-mode-forward-use -1))
 
+(defun racket-check-syntax-mode-help ()
+  (interactive)
+  (describe-function #'racket-check-syntax-mode))
+
 (define-minor-mode racket-check-syntax-mode
   "Analyze the buffer and annotate with information.
 
 The buffer becomes read-only until you exit this minor mode.
 However you may navigate the usual ways. When point is on a
 definition or usage, related items are highlighted and
-information is displayed in the status line. You may also use
+information is displayed in the echo area. You may also use
 special commands to navigate among the definition and its usages.
 
 \\{racket-check-syntax-mode-map}"
   :lighter " CheckSyntax"
   :keymap '(("q" . racket-check-syntax-mode-quit)
+            ("h" . racket-check-syntax-mode-help)
             ("." . racket-check-syntax-mode-goto-def)
             ("n" . racket-check-syntax-mode-goto-next-use)
             ("p" . racket-check-syntax-mode-goto-prev-use))
 
+  (unless (eq major-mode 'racket-mode)
+    (setq racket-check-syntax-mode nil)
+    (error "racket-check-syntax-mode only works with racket-mode"))
   (racket--check-syntax-stop)
   (when racket-check-syntax-mode
-    ;; TODO: Check that current buffer is racket-mode?
     (racket--check-syntax-start)))
 
 (defun racket--check-syntax-start ()
@@ -702,43 +709,30 @@ special commands to navigate among the definition and its usages.
       (dolist (x result)
         (cl-case (nth 0 x)
           ((info)
-           (put-text-property (1+ (nth 1 x)) (1+ (nth 2 x))
-                              'help-echo (nth 3 x)))
-          ((arrow)
-           (let* ((def-beg (1+ (nth 1 x)))
-                  (def-end (1+ (nth 2 x)))
-                  (use-beg (1+ (nth 3 x)))
-                  (use-end (1+ (nth 4 x))))
+           (put-text-property (nth 1 x) (nth 2 x) 'help-echo (nth 3 x)))
+          ((def/uses)
+           (let* ((def-beg (nth 1 x))
+                  (def-end (nth 2 x))
+                  (uses    (nth 3 x)))
              ;; Properties for the definition
-             (put-text-property def-beg def-end
-                                'racket-check-syntax-def
-                                (sort
-                                 (cons (list use-beg use-end)
-                                       (get-text-property
-                                        def-beg
-                                        'racket-check-syntax-def))
-                                 (lambda (a b) (< (car a) (car b)))))
-             (put-text-property def-beg def-end
-                                'point-entered
-                                #'racket--point-entered)
-             (put-text-property def-beg def-end
-                                'point-left
-                                #'racket--point-left)
+             (add-text-properties def-beg def-end
+                                  `(racket-check-syntax-def ,uses
+                                   point-entered ,#'racket--point-entered
+                                   point-left ,#'racket--point-left))
              ;; Properties for the usage.
-             (put-text-property use-beg use-end
-                                'racket-check-syntax-use
-                                (list def-beg def-end))
-             (put-text-property use-beg use-end
-                                'point-entered
-                                #'racket--point-entered)
-             (put-text-property use-beg use-end
-                                'point-left
-                                #'racket--point-left)))))
+             (dolist (use uses)
+               (-let (((use-beg use-end) use))
+                 (add-text-properties use-beg use-end
+                                      `(racket-check-syntax-use (,def-beg ,def-end)
+                                        point-entered ,#'racket--point-entered
+                                        point-left ,#'racket--point-left))))))))
       (setq buffer-read-only t)
       (racket--point-entered (point-min) (point))
-      (message "Move to see bindings. Buffer is read-only. Press q to quit."))))
+      (setq header-line-format
+            "Check Syntax. Buffer is read-only. Press h for help, q to quit."))))
 
 (defun racket--check-syntax-stop ()
+  (setq header-line-format nil)
   (with-silent-modifications
     (remove-text-properties (point-min)
                             (point-max)

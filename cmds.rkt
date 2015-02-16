@@ -563,31 +563,39 @@
                                   (f path))))
                             #:catch exn:fail? _ (λ _ '()))])
     (λ (path)
-      (define xs
+      ;; Note: Adjust all positions to 1-based Emacs `point' values.
+      ;; Get all the data.
+      (define xs (show-content path))
+      ;; Extract the add-mouse-over-status items into a list.
+      (define infos
         (remove-duplicates
-         (filter
-          values
-          (for/list ([x (in-list (show-content path))])
-            (match x
-              [(vector 'syncheck:add-arrow/name-dup
-                       beg-def end-def beg-use end-use actual? phase req? _)
-               (list 'arrow beg-def end-def beg-use end-use)]
-              [(vector 'syncheck:add-mouse-over-status beg end str)
-               (list 'info beg end str)]
-              [_ #f])))))
-      ;;(pretty-print xs)
-      (elisp-println xs))))
-
-(define (adjust-paths x)
-  ;; Convert all paths to path-strings.
-  (let loop ([x x])
-    (match x
-      [(? pair? x) (cons (loop (car x)) (loop (cdr x)))]
-      [(? vector? x) (for/vector ([x (in-vector x)])
-                       (loop x))]
-      [(? path? x) (path->string x)]
-      [(? procedure?) null]
-      [_ x])))
+         (filter values
+                 (for/list ([x (in-list xs)])
+                   (match x
+                     [(vector 'syncheck:add-mouse-over-status beg end str)
+                      (list 'info (add1 beg) (add1 end) str)]
+                     [_ #f])))))
+      ;; Consolidate the add-arrow/name-dup items into a hash table
+      ;; with one item per definition. The key is the definition
+      ;; position. The value is the set of its uses.
+      (define ht-defs/uses (make-hash))
+      (for ([x (in-list xs)])
+        (match x
+          [(vector 'syncheck:add-arrow/name-dup
+                   def-beg def-end use-beg use-end _ _ _ _)
+           (hash-update! ht-defs/uses
+                         (list (add1 def-beg) (add1 def-end))
+                         (λ (v) (set-add v (list (add1 use-beg) (add1 use-end))))
+                         (set))]
+          [_ #f]))
+      ;; Convert the hash table into a list, sorting the usage positions.
+      (define defs/uses
+        (for/list ([(def uses) (in-hash ht-defs/uses)])
+          (match-define (list def-beg def-end) def)
+          (define tweaked-uses (sort (set->list uses) < #:key car))
+          (list 'def/uses def-beg def-end tweaked-uses)))
+      ;; Append both lists and print as Elisp values.
+      (elisp-println (append infos defs/uses)))))
 
 ;; Local Variables:
 ;; coding: utf-8

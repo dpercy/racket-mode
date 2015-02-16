@@ -433,13 +433,14 @@ Analyze the buffer and annotate with information.
 The buffer becomes read-only until you exit this minor mode.
 However you may navigate the usual ways. When point is on a
 definition or usage, related items are highlighted and
-information is displayed in the status line. You may also use
+information is displayed in the echo area. You may also use
 special commands to navigate among the definition and its usages.
 
 key             binding
 ---             -------
 
 .		racket-check-syntax-mode-goto-def
+h		racket-check-syntax-mode-help
 n		racket-check-syntax-mode-goto-next-use
 p		racket-check-syntax-mode-goto-prev-use
 q		racket-check-syntax-mode-quit
