@@ -565,7 +565,7 @@
     (λ (path)
       ;; Note: Adjust all positions to 1-based Emacs `point' values.
       ;; Get all the data.
-      (define xs (show-content path))
+      (define xs (remove-duplicates (show-content path)))
       ;; Extract the add-mouse-over-status items into a list.
       (define infos
         (remove-duplicates
