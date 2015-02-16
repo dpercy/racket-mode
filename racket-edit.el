@@ -674,6 +674,45 @@ If point is instead on a definition, then go to its first usage."
   (interactive)
   (describe-function #'racket-check-syntax-mode))
 
+(defun racket-check-syntax-mode-rename ()
+  (interactive)
+  ;; If we're on a def, get its uses. If we're on a use, get its def.
+  (let* ((pt (point))
+         (uses (get-text-property pt 'racket-check-syntax-def))
+         (def  (get-text-property pt 'racket-check-syntax-use)))
+    ;; If we got one, get the other.
+    (when (or uses def)
+      (let* ((uses (or uses (get-text-property (car def)   'racket-check-syntax-def)))
+             (def  (or def  (get-text-property (caar uses) 'racket-check-syntax-use)))
+             (locs (cons def uses))
+             (strs (mapcar (lambda (loc)
+                             (apply #'buffer-substring-no-properties loc))
+                           locs)))
+        ;; Proceed only if all the strings are the same. (They won't
+        ;; be for e.g. import bindings.)
+        (when (cl-every (lambda (s) (equal (car strs) s))
+                        (cdr strs))
+          (let ((new (read-from-minibuffer (format "Rename %s to: " (car strs))))
+                (marker-pairs
+                 (mapcar (lambda (loc)
+                           (let ((beg (make-marker))
+                                 (end (make-marker)))
+                             (set-marker beg (nth 0 loc) (current-buffer))
+                             (set-marker end (nth 1 loc) (current-buffer))
+                             (list beg end)))
+                         locs))
+                (point-marker (let ((m (make-marker)))
+                                (set-marker m (point) (current-buffer)))))
+            (racket-check-syntax-mode -1)
+            (dolist (marker-pair marker-pairs)
+              (let ((beg (marker-position (nth 0 marker-pair)))
+                    (end (marker-position (nth 1 marker-pair))))
+                (delete-region beg end)
+                (goto-char beg)
+                (insert new)))
+            (goto-char (marker-position point-marker))
+            (racket-check-syntax-mode 1)))))))
+
 (define-minor-mode racket-check-syntax-mode
   "Analyze the buffer and annotate with information.
 
@@ -689,8 +728,8 @@ special commands to navigate among the definition and its usages.
             ("h" . racket-check-syntax-mode-help)
             ("." . racket-check-syntax-mode-goto-def)
             ("n" . racket-check-syntax-mode-goto-next-use)
-            ("p" . racket-check-syntax-mode-goto-prev-use))
-
+            ("p" . racket-check-syntax-mode-goto-prev-use)
+            ("r" . racket-check-syntax-mode-rename))
   (unless (eq major-mode 'racket-mode)
     (setq racket-check-syntax-mode nil)
     (error "racket-check-syntax-mode only works with racket-mode"))
@@ -731,7 +770,8 @@ special commands to navigate among the definition and its usages.
       (setq buffer-read-only t)
       (racket--point-entered (point-min) (point)) ;in case already in one
       (setq header-line-format
-            "Check Syntax. Buffer is read-only. Press h for help, q to quit."))))
+            "Check Syntax. Buffer is read-only. Press h for help, q to quit."))
+    (message "")))
 
 (defun racket--check-syntax-stop ()
   (setq header-line-format nil)
