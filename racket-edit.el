@@ -702,11 +702,11 @@ special commands to navigate among the definition and its usages.
   (racket-run) ;ensure REPL is evaluating this buffer
   (racket--eval/string "(void)") ;hack to consume output from previous
   (message "Analyzing...")
-  (let ((result (racket--eval/sexpr (format ",check-syntax\n\n"))))
-    (unless result
+  (let ((xs (racket--eval/sexpr (format ",check-syntax\n\n"))))
+    (unless xs
       (error "Requires a newer version of Racket."))
     (with-silent-modifications
-      (dolist (x result)
+      (dolist (x xs)
         (cl-case (nth 0 x)
           ((info)
            (put-text-property (nth 1 x) (nth 2 x) 'help-echo (nth 3 x)))
@@ -714,20 +714,22 @@ special commands to navigate among the definition and its usages.
            (let* ((def-beg (nth 1 x))
                   (def-end (nth 2 x))
                   (uses    (nth 3 x)))
-             ;; Properties for the definition
-             (add-text-properties def-beg def-end
-                                  `(racket-check-syntax-def ,uses
-                                   point-entered ,#'racket--point-entered
-                                   point-left ,#'racket--point-left))
-             ;; Properties for the usage.
+             (add-text-properties
+              def-beg
+              def-end
+              (list 'racket-check-syntax-def uses
+                    'point-entered #'racket--point-entered
+                    'point-left #'racket--point-left))
              (dolist (use uses)
                (-let (((use-beg use-end) use))
-                 (add-text-properties use-beg use-end
-                                      `(racket-check-syntax-use (,def-beg ,def-end)
-                                        point-entered ,#'racket--point-entered
-                                        point-left ,#'racket--point-left))))))))
+                 (add-text-properties
+                  use-beg
+                  use-end
+                  (list 'racket-check-syntax-use (list def-beg def-end)
+                        'point-entered #'racket--point-entered
+                        'point-left #'racket--point-left))))))))
       (setq buffer-read-only t)
-      (racket--point-entered (point-min) (point))
+      (racket--point-entered (point-min) (point)) ;in case already in one
       (setq header-line-format
             "Check Syntax. Buffer is read-only. Press h for help, q to quit."))))
 
