@@ -68,14 +68,14 @@ Each level improves stack trace information, but causes your
 program to run more slowly.
 
   - 'low corresponds to `compile-context-preservation-enabled`
-    #f.
+    `#f`.
 
   - 'medium corresponds to `compile-context-preservation-enabled`
-    #t, which disables some optimizations like inlining.
+    `#t`, which disables some optimizations like inlining.
 
   - 'high corresponds to `compile-context-preservation-enabled`
-    #t and to use of errortrace, which heavily instruments your
-    code and therefore may be significantly slower.
+    `#t` and to use of `errortrace`, which heavily instruments
+    your code and therefore may be significantly slower.
 
 Tip: Regardless of this setting, you can enable full errortrace
 for a specific `racket-run' using a C-u prefix."
