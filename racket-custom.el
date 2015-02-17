@@ -61,6 +61,13 @@ the limit (maybe by a significant amount)."
   :safe #'integerp
   :group 'racket)
 
+(defcustom racket-errortrace nil
+  "Run with errortrace, which is 2-3X slower but gives better stack traces."
+  :tag "Errortrace"
+  :type 'boolean
+  :safe #'booleanp
+  :group 'racket)
+
 ;;; REPL
 
 (defgroup racket-repl nil

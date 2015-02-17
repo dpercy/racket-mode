@@ -84,10 +84,11 @@ Others are available only as a command in the REPL.
   (save-buffer)
   (racket--invalidate-completion-cache)
   (racket--invalidate-type-cache)
-  (racket--eval (format ",run %s %s %s\n"
+  (racket--eval (format ",run %s %s %s %s\n"
                         (racket--quoted-buffer-file-name)
                         racket-memory-limit
-                        racket-pretty-print)))
+                        racket-pretty-print
+                        racket-errortrace)))
 
 (defun racket-racket ()
   "Do `racket <file>` in `*shell*` buffer."
