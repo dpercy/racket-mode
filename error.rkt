@@ -23,17 +23,8 @@
       (display-commented (fully-qualify-error-path str))
       (display-srclocs exn)
       (unless (exn:fail:user? exn)
-        (if (instrumenting-enabled)
-            (display-errortrace exn)
-            (display-context exn)))
+        (display-context exn))
       (maybe-suggest-packages exn))))
-
-(define (display-errortrace exn)
-  (define p (open-output-string))
-  (print-error-trace p exn)
-  (match (get-output-string p)
-    ["" (void)]
-    [s  (display-commented (string-append "Context (errortrace):" s))]))
 
 (define (display-srclocs exn)
   (when (exn:srclocs? exn)
@@ -48,11 +39,20 @@
         (display-commented (source-location->string srcloc))))))
 
 (define (display-context exn)
-  (match (context->string
-          (continuation-mark-set->context (exn-continuation-marks exn)))
-    ["" (void)]
-    [s (display-commented "Context:")
-       (display-commented s)]))
+  (cond [(instrumenting-enabled)
+         (define p (open-output-string))
+         (print-error-trace p exn)
+         (match (get-output-string p)
+           ["" (void)]
+           [s  (display-commented (string-append "Context (errortrace):"
+                                                 ;; et prepends a \n
+                                                 s))])]
+        [else
+         (match (context->string
+                 (continuation-mark-set->context (exn-continuation-marks exn)))
+           ["" (void)]
+           [s (display-commented (string-append "Context:\n"
+                                                s))])]))
 
 (define (context->string xs)
   ;; Limit the context in two ways:
