@@ -58,11 +58,10 @@
   ;; Limit the context in two ways:
   ;; 1. Don't go beyond error-print-context-length
   ;; 2. Don't go into "system" context that's just noisy.
-  ;; Also, show the context in reverse, for Emacs compilation-mode.
-  (string-join (reverse (for/list ([x xs]
-                                   [_ (error-print-context-length)]
-                                   #:unless (system-context? x))
-                          (context-item->string x)))
+  (string-join (for/list ([x xs]
+                          [_ (error-print-context-length)]
+                          #:unless (system-context? x))
+                 (context-item->string x))
                "\n"))
 
 (define-runtime-path run.rkt "run.rkt")
