@@ -26,7 +26,7 @@
 (require 'racket-util)
 (require 'hideshow)
 
-(defun racket-run ()
+(defun racket-run (&optional errortracep)
   "Save and evaluate the buffer in REPL, like DrRacket's Run.
 
 When you run again, the files is evaluated from scratch -- the
@@ -34,6 +34,9 @@ custodian releases resources like threads and the evaluation
 environment is reset to the contents of the file. In other words,
 like DrRacket, this provides the predictability of a \"static\"
 baseline, plus some interactive exploration.
+
+With a C-u prefix, uses errortrace for improved stack traces.
+Otherwise follows the `racket-error-context' setting.
 
 Output in the `*Racket REPL*` buffer that describes a file and
 position is automatically \"linkified\". To visit, move point
@@ -80,7 +83,7 @@ Others are available only as a command in the REPL.
     - `,log <level>`: Set the default level for all other loggers
       not specified individually.
 "
-  (interactive)
+  (interactive "P")
   (save-buffer)
   (racket--invalidate-completion-cache)
   (racket--invalidate-type-cache)
@@ -88,7 +91,9 @@ Others are available only as a command in the REPL.
                         (racket--quoted-buffer-file-name)
                         racket-memory-limit
                         racket-pretty-print
-                        racket-errortrace)))
+                        (if errortracep
+                            'full
+                          racket-error-context))))
 
 (defun racket-racket ()
   "Do `racket <file>` in `*shell*` buffer."

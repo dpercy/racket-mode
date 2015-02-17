@@ -61,11 +61,29 @@ the limit (maybe by a significant amount)."
   :safe #'integerp
   :group 'racket)
 
-(defcustom racket-errortrace nil
-  "Run with errortrace, which is 2-3X slower but gives better stack traces."
-  :tag "Errortrace"
-  :type 'boolean
-  :safe #'booleanp
+(defcustom racket-error-context 'medium
+  "The level of context used for `racket-run' error stack traces.
+
+Each level improves stack trace information, but causes your
+program to run more slowly.
+
+  - 'low corresponds to `compile-context-preservation-enabled`
+    #f.
+
+  - 'medium corresponds to `compile-context-preservation-enabled`
+    #t, which disables some optimizations like inlining.
+
+  - 'high corresponds to `compile-context-preservation-enabled`
+    #t and to use of errortrace, which heavily instruments your
+    code and therefore may be significantly slower.
+
+Tip: Regardless of this setting, you can enable full errortrace
+for a specific `racket-run' using a C-u prefix."
+  :tag "Error Context"
+  :type '(radio (const :tag "Low" low)
+                (const :tag "Medium (slower)" medium)
+                (const :tag "High (much slower)" high))
+  :risky t
   :group 'racket)
 
 ;;; REPL

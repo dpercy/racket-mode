@@ -19,10 +19,10 @@
   (parameterize ([error-display-handler our-error-display-handler])
     (run #f)))
 
-(define (run maybe-path-str     ;(or/c #f path-string?)
-             [mem-limit #f]     ;(or/c #f natural?)
-             [pretty-print? #t] ;boolean?
-             [errortrace? #f])  ;boolean?
+(define (run maybe-path-str             ;(or/c #f path-string?)
+             [mem-limit #f]             ;(or/c #f natural?)
+             [pretty-print? #t]         ;boolean?
+             [error-context 'normal])   ;(or/c 'low 'medium 'high)
   (define-values (path dir) (path-string->path&dir maybe-path-str))
   ;; Always set current-directory and current-load-relative-directory
   ;; to match the source file.
@@ -44,16 +44,19 @@
       ([current-custodian user-cust]
        ;; Use parameterize* so that `current-namespace` ...
        [current-namespace ((txt/gui make-base-namespace make-gui-namespace))]
-       ;; ... is in effect when setting `current-eventspace`:
+       ;; ... is in effect when setting `current-eventspace` and others:
        [current-eventspace ((txt/gui void make-eventspace))]
        [compile-enforce-module-constants #f]
-       [compile-context-preservation-enabled #t]
-       [current-compile (if errortrace?
+       [compile-context-preservation-enabled (not (not (memq error-context
+                                                             '(medium high))))]
+       [current-compile (if (eq? error-context 'high)
                             (make-errortrace-compile-handler)
                             (current-compile))]
-       [instrumenting-enabled errortrace?]
-       [use-compiled-file-paths (cons (build-path "compiled" "errortrace")
-                                      (use-compiled-file-paths))])
+       [instrumenting-enabled (eq? error-context 'high)]
+       [use-compiled-file-paths (if (eq? error-context 'high)
+                                    (cons (build-path "compiled" "errortrace")
+                                          (use-compiled-file-paths))
+                                    (use-compiled-file-paths))])
     ;; repl-thunk will be called from another thread -- either a plain
     ;; thread when racket/gui/base is not (yet) instantiated, or, from
     ;; (event-handler-thread (current-eventspace)).
@@ -125,7 +128,7 @@
 ;; Messages via a channel from the repl thread to the main thread.
 (define ch (make-channel))
 (struct msg ())
-(struct rerun    msg (path mem pp? et?))
+(struct rerun    msg (path mem pp? err-ctx))
 (struct load-gui msg ())
 
 ;; To be called from REPL thread. Puts message for the main thread to
