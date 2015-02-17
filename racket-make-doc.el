@@ -132,6 +132,7 @@
     racket-racket-program
     racket-raco-program
     racket-memory-limit
+    racket-error-context
     "REPL"
     racket-history-filter-regexp
     racket-images-inline

@@ -29,6 +29,9 @@ environment is reset to the contents of the file. In other words,
 like DrRacket, this provides the predictability of a "static"
 baseline, plus some interactive exploration.
 
+With a C-u prefix, uses errortrace for improved stack traces.
+Otherwise follows the [`racket-error-context`](#racket-error-context) setting.
+
 Output in the `*Racket REPL*` buffer that describes a file and
 position is automatically "linkified". To visit, move point
 there and press <kdb>RET</kbd>, mouse click, or use a
@@ -495,6 +498,25 @@ Caveat: This uses Racket's `custodian-limit-memory`, which does
 not enforce the limit exactly. Instead, the program will be
 terminated upon the first garbage collection where memory exceeds
 the limit (maybe by a significant amount).
+
+### racket-error-context
+The level of context used for [`racket-run`](#racket-run) error stack traces.
+
+Each level improves stack trace information, but causes your
+program to run more slowly.
+
+  - 'low corresponds to `compile-context-preservation-enabled`
+    #f.
+
+  - 'medium corresponds to `compile-context-preservation-enabled`
+    #t, which disables some optimizations like inlining.
+
+  - 'high corresponds to `compile-context-preservation-enabled`
+    #t and to use of errortrace, which heavily instruments your
+    code and therefore may be significantly slower.
+
+Tip: Regardless of this setting, you can enable full errortrace
+for a specific [`racket-run`](#racket-run) using a C-u prefix.
 
 ## REPL
 
