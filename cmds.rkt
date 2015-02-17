@@ -105,47 +105,43 @@
   (define (go path)
     (put/stop (rerun (~a path) (current-mem) (current-pp?) (current-err-ctx))))
   (match (read-line->reads)
-    [(list path mem pp? ctx) (cond [(and (number? mem) (boolean? pp?)
-                                         (and (symbol? ctx) (memq ctx '(low medium high))))
-                                    (current-mem mem)
-                                    (current-pp? pp?)
-                                    (current-err-ctx ctx)
-                                    (go path)]
-                                   [else (usage)])]
-    [(list path mem pp?) (cond [(and (number? mem) (boolean? pp?))
-                                (current-mem mem)
-                                (current-pp? pp?)
-                                (go path)]
-                               [else (usage)])]
-    [(list path mem)     (cond [(number? mem)
-                                (current-mem mem)
-                                (go path)]
-                               [else (usage)])]
-    [(list path)         (go path)]
-    [_                   (usage)]))
+    [(list path (? number? mem) (? boolean? pp?) (and ctx (or 'low 'medium 'high)))
+     (current-mem mem)
+     (current-pp? pp?)
+     (current-err-ctx ctx)
+     (go path)]
+    [(list path (? number? mem) (? boolean? pp?))
+     (current-mem mem)
+     (current-pp? pp?)
+     (go path)]
+    [(list path (? number? mem) (? boolean? pp?))
+     (current-mem mem)
+     (go path)]
+    [(list path)
+     (go path)]
+    [_
+     (usage)]))
 
 (define (top put/stop rerun)
   (define (go)
     (put/stop (rerun #f (current-mem) (current-pp?) (current-err-ctx))))
-  (match (read-line->reads)
-    [(list mem pp? ctx) (cond [(and (number? mem) (boolean? pp?)
-                                    (and (symbol? ctx) (memq ctx '(low medium high))))
-                               (current-mem mem)
-                               (current-pp? pp?)
-                               (current-err-ctx ctx)
-                               (go)]
-                              [else (usage)])]
-    [(list mem pp?) (cond [(and (number? mem) (boolean? pp?))
-                           (current-mem mem)
-                           (current-pp? pp?)
-                           (go)]
-                          [else (usage)])]
-    [(list mem)     (cond [(number? mem)
-                           (current-mem mem)
-                           (go)]
-                          [else (usage)])]
-    [(list)         (go)]
-    [_              (usage)]))
+    (match (read-line->reads)
+    [(list (? number? mem) (? boolean? pp?) (and ctx (or 'low 'medium 'high)))
+     (current-mem mem)
+     (current-pp? pp?)
+     (current-err-ctx ctx)
+     (go)]
+    [(list (? number? mem) (? boolean? pp?))
+     (current-mem mem)
+     (current-pp? pp?)
+     (go)]
+    [(list (? number? mem) (? boolean? pp?))
+     (current-mem mem)
+     (go)]
+    [(list)
+     (go)]
+    [_
+     (usage)]))
 
 (define (read-line->reads)
   (reads-from-string (read-line)))
