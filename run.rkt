@@ -1,6 +1,7 @@
 #lang racket/base
 
-(require racket/match
+(require errortrace/errortrace-lib
+         racket/match
          racket/runtime-path
          racket/pretty
          "cmds.rkt"
@@ -18,8 +19,10 @@
   (parameterize ([error-display-handler our-error-display-handler])
     (run #f)))
 
-;; run: (or/c #f path-string?) (or/c #f natural?) boolean? -> any
-(define (run maybe-path-str [mem-limit #f] [pretty-print? #t])
+(define (run maybe-path-str     ;(or/c #f path-string?)
+             [mem-limit #f]     ;(or/c #f natural?)
+             [pretty-print? #t] ;boolean?
+             [errortrace? #f])  ;boolean?
   (define-values (path dir) (path-string->path&dir maybe-path-str))
   ;; Always set current-directory and current-load-relative-directory
   ;; to match the source file.
@@ -39,12 +42,18 @@
   (define current-eventspace (txt/gui (make-parameter #f) current-eventspace))
   (parameterize*
       ([current-custodian user-cust]
-       ;; Use parameterize* so that this value...
+       ;; Use parameterize* so that `current-namespace` ...
        [current-namespace ((txt/gui make-base-namespace make-gui-namespace))]
-       ;; ...is in effect when setting this:
+       ;; ... is in effect when setting `current-eventspace`:
        [current-eventspace ((txt/gui void make-eventspace))]
        [compile-enforce-module-constants #f]
-       [compile-context-preservation-enabled #t])
+       [compile-context-preservation-enabled #t]
+       [current-compile (if errortrace?
+                            (make-errortrace-compile-handler)
+                            (current-compile))]
+       [instrumenting-enabled errortrace?]
+       [use-compiled-file-paths (cons (build-path "compiled" "errortrace")
+                                      (use-compiled-file-paths))])
     ;; repl-thunk will be called from another thread -- either a plain
     ;; thread when racket/gui/base is not (yet) instantiated, or, from
     ;; (event-handler-thread (current-eventspace)).
@@ -61,7 +70,7 @@
           ;; exn:fail? during module load => re-run with "empty" module
           (with-handlers ([exn? (λ (x)
                                   (display-exn x)
-                                  (put/stop (rerun #f mem-limit #t)))])
+                                  (put/stop (rerun #f mem-limit #t #f)))])
             (maybe-load-language-info path)
             (namespace-require path)
             (current-namespace (module->namespace path))
@@ -87,9 +96,9 @@
   (custodian-shutdown-all user-cust)
   (newline) ;; FIXME: Move this to racket-mode.el instead?
   (match msg
-    ['break               (run #f mem-limit)]
-    [(rerun path mem pp?) (run path mem pp?)]
-    [(load-gui)           (require-gui) (run maybe-path-str)]))
+    ['break                   (run #f mem-limit)]
+    [(rerun path mem pp? et?) (run path mem pp? et?)]
+    [(load-gui)               (require-gui) (run maybe-path-str)]))
 
 (define (maybe-load-language-info path)
   ;; Load language-info (if any) and do configure-runtime.
@@ -116,7 +125,7 @@
 ;; Messages via a channel from the repl thread to the main thread.
 (define ch (make-channel))
 (struct msg ())
-(struct rerun    msg (path mem pp?)) ;(or/c #f path-string?) (or/c #f nat?) boolean?
+(struct rerun    msg (path mem pp? et?))
 (struct load-gui msg ())
 
 ;; To be called from REPL thread. Puts message for the main thread to

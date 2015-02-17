@@ -97,12 +97,20 @@
 
 (define current-pp? (make-parameter #t))
 
+(define current-et? (make-parameter #f))
+
 (define (run put/stop rerun)
   ;; Note: Use ~a on path to allow both `,run "/path/file.rkt"` and
   ;; `run /path/file.rkt`.
   (define (go path)
-    (put/stop (rerun (~a path) (current-mem) (current-pp?))))
+    (put/stop (rerun (~a path) (current-mem) (current-pp?) (current-et?))))
   (match (read-line->reads)
+    [(list path mem pp? et?) (cond [(and (number? mem) (boolean? pp?) (boolean? et?))
+                                    (current-mem mem)
+                                    (current-pp? pp?)
+                                    (current-et? et?)
+                                    (go path)]
+                                   [else (usage)])]
     [(list path mem pp?) (cond [(and (number? mem) (boolean? pp?))
                                 (current-mem mem)
                                 (current-pp? pp?)
@@ -117,8 +125,14 @@
 
 (define (top put/stop rerun)
   (define (go)
-    (put/stop (rerun #f (current-mem) (current-pp?))))
+    (put/stop (rerun #f (current-mem) (current-pp?) (current-et?))))
   (match (read-line->reads)
+    [(list mem pp? et?) (cond [(and (number? mem) (boolean? pp?) (boolean? et?))
+                               (current-mem mem)
+                               (current-pp? pp?)
+                               (current-et? et?)
+                               (go)]
+                              [else (usage)])]
     [(list mem pp?) (cond [(and (number? mem) (boolean? pp?))
                            (current-mem mem)
                            (current-pp? pp?)

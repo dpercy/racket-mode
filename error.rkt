@@ -1,6 +1,7 @@
 #lang racket/base
 
-(require racket/match
+(require errortrace/errortrace-lib
+         racket/match
          racket/runtime-path
          racket/string
          "util.rkt"
@@ -22,8 +23,17 @@
       (display-commented (fully-qualify-error-path str))
       (display-srclocs exn)
       (unless (exn:fail:user? exn)
-        (display-context exn))
+        (if (instrumenting-enabled)
+            (display-errortrace exn)
+            (display-context exn)))
       (maybe-suggest-packages exn))))
+
+(define (display-errortrace exn)
+  (define p (open-output-string))
+  (print-error-trace p exn)
+  (match (get-output-string p)
+    ["" (void)]
+    [s  (display-commented (string-append "Context (errortrace):" s))]))
 
 (define (display-srclocs exn)
   (when (exn:srclocs? exn)
