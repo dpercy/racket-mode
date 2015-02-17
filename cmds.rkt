@@ -1,4 +1,4 @@
-#lang racket/base
+#lang at-exp racket/base
 
 (require help/help-utils
          macro-debugger/analysis/check-requires
@@ -41,8 +41,9 @@
         [(uq cmd)
          (eq? 'unquote (syntax-e #'uq))
          (case (syntax-e #'cmd)
-           [(run) (run put/stop rerun)]
-           [(top) (top put/stop rerun)]
+           [(run) (run-or-top 'run put/stop rerun)]
+           [(top) (run-or-top 'top put/stop rerun)]
+           [(info) (info)]
            [(def) (def (read))]
            [(doc) (doc (read-syntax))]
            [(describe) (describe (read-syntax))]
@@ -66,7 +67,8 @@
   (displayln
    "Commands:
 ,run </path/to/file.rkt> [<memory-limit-MB> [<pretty-print?> [<error-context>]]]
-,top [<memory-limit-MB>]
+,top [<memory-limit-MB> [<pretty-print?> [<error-context>]]]
+     <error-context> = low | medium | high
 ,exit
 ,def <identifier>
 ,type <identifier>
@@ -79,7 +81,7 @@
 ,log <opts> ...")
   (void))
 
-;;; run and top
+;;; run, top, info
 
 ;; Parameter-like interface, but we don't care about thread-local
 ;; stuff. We do care about calling collect-garbage IFF the new limit
@@ -97,14 +99,24 @@
 
 (define current-pp? (make-parameter #t))
 
-(define current-err-ctx (make-parameter #f))
+(define current-err-ctx (make-parameter 'low)) ;(or/c 'low 'medium 'high)
 
-(define (run put/stop rerun)
-  ;; Note: Use ~a on path to allow both `,run "/path/file.rkt"` and
-  ;; `run /path/file.rkt`.
+(define (info)
+  (displayln @~a{Memory Limit:  @(current-mem)
+                 Pretty Print:  @(current-pp?)
+                 Error Context: @(current-err-ctx)}))
+
+(define (run-or-top which put/stop rerun)
+  ;; Support both the ,run and ,top commands. Latter has no first path
+  ;; arg, but otherwise they share subsequent optional args.
   (define (go path)
-    (put/stop (rerun (~a path) (current-mem) (current-pp?) (current-err-ctx))))
-  (match (read-line->reads)
+    (put/stop (rerun (and path (~a path)) ;"/path/file" or /path/file
+                     (current-mem)
+                     (current-pp?)
+                     (current-err-ctx))))
+  (match (match which
+           ['run (read-line->reads)]
+           ['top (cons #f (read-line->reads))]) ;i.e. path = #f
     [(list path (? number? mem) (? boolean? pp?) (and ctx (or 'low 'medium 'high)))
      (current-mem mem)
      (current-pp? pp?)
@@ -122,26 +134,6 @@
     [_
      (usage)]))
 
-(define (top put/stop rerun)
-  (define (go)
-    (put/stop (rerun #f (current-mem) (current-pp?) (current-err-ctx))))
-    (match (read-line->reads)
-    [(list (? number? mem) (? boolean? pp?) (and ctx (or 'low 'medium 'high)))
-     (current-mem mem)
-     (current-pp? pp?)
-     (current-err-ctx ctx)
-     (go)]
-    [(list (? number? mem) (? boolean? pp?))
-     (current-mem mem)
-     (current-pp? pp?)
-     (go)]
-    [(list (? number? mem) (? boolean? pp?))
-     (current-mem mem)
-     (go)]
-    [(list)
-     (go)]
-    [_
-     (usage)]))
 
 (define (read-line->reads)
   (reads-from-string (read-line)))
