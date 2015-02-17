@@ -65,7 +65,7 @@
 (define (usage)
   (displayln
    "Commands:
-,run </path/to/file.rkt> [<memory-limit-MB> [<pretty-print?>]]
+,run </path/to/file.rkt> [<memory-limit-MB> [<pretty-print?> [errortrace?]]]
 ,top [<memory-limit-MB>]
 ,exit
 ,def <identifier>
