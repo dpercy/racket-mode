@@ -77,12 +77,18 @@ program to run more slowly.
     `#t` and to use of `errortrace`, which heavily instruments
     your code and therefore may be significantly slower.
 
+  - 'profile corresponds using all of
+    `compile-context-preservation-enabled`, `errortrace`,
+    `instrumenting-enabled`, `profiling-enabled`. For use with
+    `racket-profile'.
+
 Tip: Regardless of this setting, you can enable full errortrace
 for a specific `racket-run' using a C-u prefix."
   :tag "Error Context"
   :type '(radio (const :tag "Low" low)
                 (const :tag "Medium (slower)" medium)
-                (const :tag "High (much slower)" high))
+                (const :tag "High (much slower)" high)
+                (const :tag "Profile" profile))
   :risky t
   :group 'racket)
 

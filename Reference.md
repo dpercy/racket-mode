@@ -21,9 +21,9 @@
 ### racket-run
 <kbd>&lt;f5&gt;</kbd> or <kbd>C-c C-k</kbd>
 
-Save and evaluate the buffer in REPL, like DrRacket's Run.
+Save and evaluate the buffer in REPL, much like DrRacket's Run.
 
-When you run again, the files is evaluated from scratch -- the
+When you run again, the file is evaluated from scratch -- the
 custodian releases resources like threads and the evaluation
 environment is reset to the contents of the file. In other words,
 like DrRacket, this provides the predictability of a "static"
@@ -83,12 +83,37 @@ Others are available only as a command in the REPL.
 
 Do `racket <file>` in `*shell*` buffer.
 
+### racket-profile
+<kbd>M-x racket-profile</kbd>
+
+Get profiling results in a [`racket-profile-mode`](#racket-profile-mode) buffer.
+
+key             binding
+---             -------
+
+RET		racket--profile-visit
+,		racket--profile-sort
+g		racket--profile-refresh
+n		racket--profile-next
+p		racket--profile-prev
+q		racket--profile-quit
+
+
+
+If the buffer has already been run with [`racket-error-context`](#racket-error-context)
+set to 'profile, shows those results. Otherwise, prompts to
+re-run with profiling instrumentation.
+
+You may evaluate additonal expressions in the REPL. They will be
+profiled, too. In that case use [`racket--profile-refresh`](#racket--profile-refresh) to see
+the updated results.
+
 ## Test
 
 ### racket-test
 <kbd>&lt;C-f5&gt;</kbd>
 
-Do `(require (submod "." test))` in `*racket*` buffer.
+Do `(require (submod "." test))` in `*Racket REPL*` buffer.
 
 See also:
 - [`racket-fold-all-tests`](#racket-fold-all-tests)
@@ -514,6 +539,11 @@ program to run more slowly.
   - 'high corresponds to `compile-context-preservation-enabled`
     `#t` and to use of `errortrace`, which heavily instruments
     your code and therefore may be significantly slower.
+
+  - 'profile corresponds using all of
+    `compile-context-preservation-enabled`, `errortrace`,
+    `instrumenting-enabled`, `profiling-enabled`. For use with
+    [`racket-profile`](#racket-profile).
 
 Tip: Regardless of this setting, you can enable full errortrace
 for a specific [`racket-run`](#racket-run) using a C-u prefix.
