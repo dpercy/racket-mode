@@ -124,10 +124,12 @@
      (match-define (list count msec name stx _ ...) x)
      (list count
            msec
-           (if name (symbol->string name) "")
-           (path->string (syntax-source stx))
+           (and name (symbol->string name))
+           (and (syntax-source stx) (path? (syntax-source stx))
+                (path->string (syntax-source stx)))
            (syntax-position stx)
-           (+ (syntax-position stx) (syntax-span stx))))))
+           (and (syntax-position stx) (syntax-span stx)
+                (+ (syntax-position stx) (syntax-span stx)))))))
 
 (define (get-cover/count)
   (elisp-println

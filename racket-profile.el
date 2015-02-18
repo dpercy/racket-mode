@@ -69,7 +69,8 @@ the updated results."
                          (propertize (format "%8d %6d %-20.20s %s"
                                              calls msec name file)
                                      'racket-profile-location
-                                     (list file beg end))))
+                                     (and file beg end
+                                          (list file beg end)))))
                      (sort (cl-copy-list racket--profile-results)
                            (lambda (a b) (> (nth racket--profile-sort-col a)
                                             (nth racket--profile-sort-col b))))
@@ -91,12 +92,12 @@ the updated results."
   (let ((win  (selected-window))
         (prop (get-text-property (point) 'racket-profile-location)))
     (when prop
-      (setq racket--profile-overlay-this
-            (make-overlay (save-excursion (beginning-of-line) (point))
-                          (save-excursion (end-of-line) (point))
-                          (current-buffer)))
-      (overlay-put racket--profile-overlay-this 'face 'next-error)
       (cl-destructuring-bind (file beg end) prop
+        (setq racket--profile-overlay-this
+              (make-overlay (save-excursion (beginning-of-line) (point))
+                            (save-excursion (end-of-line) (point))
+                            (current-buffer)))
+        (overlay-put racket--profile-overlay-this 'face 'next-error)
         (find-file-other-window file)
         (setq racket--profile-overlay-that (make-overlay beg end (current-buffer)))
         (overlay-put racket--profile-overlay-that 'face 'next-error)
