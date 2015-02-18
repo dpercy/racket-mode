@@ -27,7 +27,6 @@
   "Run with profiling enabled. Navigate results."
   (interactive)
   (racket--do-run 'profile)
-  (racket--eval/sexpr "(void") ;; FIXME: hack in case REPL just started
   (setq racket--profile-results (racket--eval/sexpr ",get-profile"))
   (setq racket--profile-sort-col 1)
   (with-current-buffer (get-buffer-create "*Racket Profile*")
@@ -36,6 +35,7 @@
     (pop-to-buffer (current-buffer))))
 
 (defun racket--profile-sort ()
+  "Toggle sort between Count and Time."
   (interactive)
   (read-only-mode -1)
   (erase-buffer)
@@ -70,6 +70,16 @@
       (add-hook 'pre-command-hook #'racket--profile-remove-overlay)
       (select-window win))))
 
+(defun racket--profile-next ()
+  (interactive)
+  (forward-line)
+  (racket--profile-visit))
+
+(defun racket--profile-prev ()
+  (interactive)
+  (previous-line)
+  (racket--profile-visit))
+
 (defun racket--profile-remove-overlay ()
   (delete-overlay racket--profile-visit-overlay)
   (remove-hook 'pre-command-hook #'racket--profile-remove-overlay))
@@ -85,8 +95,8 @@
     (mapc (lambda (x)
             (define-key m (kbd (car x)) (cadr x)))
           '(("q"   racket--profile-quit)
-            ("n"   forward-line)
-            ("p"   previous-line)
+            ("n"   racket--profile-next)
+            ("p"   racket--profile-prev)
             ("RET" racket--profile-visit)
             (","   racket--profile-sort)))
     m)
