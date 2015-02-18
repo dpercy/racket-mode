@@ -58,8 +58,8 @@
                                    (use-compiled-file-paths))]
        [profiling-enabled (begin (clear-profile-results)
                                  (eq? context-level 'profile))]
-       [coverage-counts-enabled (eq? context-level 'cover)]
-       [execute-counts-enabled (eq? context-level 'count)]
+       [coverage-counts-enabled (eq? context-level 'cover/count)]
+       [execute-counts-enabled (eq? context-level 'cover/execute)]
        [test-coverage-info (make-hash)])
     ;; repl-thunk will be called from another thread -- either a plain
     ;; thread when racket/gui/base is not (yet) instantiated, or, from

@@ -17,9 +17,9 @@
 
 (define profile/coverage-levels
   ;; "sibling" levels that all require errortrace
-  '(profile  ;high with profiling-enabled
-    cover    ;high with coverage-counts-enabled
-    count))  ;high with execute-counts-enabled
+  '(profile         ;high with profiling-enabled
+    cover/count     ;high with coverage-counts-enabled
+    cover/execute)) ;high with execute-counts-enabled
 
 (define errortrace-levels
   '(high     ;compile-context-preservation-enabled #t + errortrace
