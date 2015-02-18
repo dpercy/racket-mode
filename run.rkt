@@ -77,7 +77,7 @@
           ;; exn:fail? during module load => re-run with "empty" module
           (with-handlers ([exn? (λ (x)
                                   (display-exn x)
-                                  (put/stop (rerun #f mem-limit #t #f)))])
+                                  (put/stop (struct-copy rerun rr [path #f])))])
             (maybe-load-language-info path)
             (namespace-require path)
             (current-namespace (module->namespace path))
