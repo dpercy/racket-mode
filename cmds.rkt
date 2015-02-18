@@ -61,6 +61,9 @@
            [(requires/trim) (requires/trim (read) (read))]
            [(requires/base) (requires/base (read) (read))]
            [(find-collection) (find-collection (read))]
+           [(get-profile) (get-profile)]
+           [(get-cover/count) (get-cover/count)]
+           [(get-cover/execute) (get-cover/execute)]
            [(exit) (exit)]
            [else (usage)])]
         [_ stx]))))
@@ -112,29 +115,37 @@
 (define (info)
   (displayln @~a{Memory Limit:  @(current-mem)
                  Pretty Print:  @(current-pp?)
-                 Error Context: @(current-ctx-lvl)})
-  ;; The following is just for dev/testing, not the final approach.
-  (when (profiling-enabled)
-    (for ([x (in-list (get-profile-results))])
-      (match-define (list count msec name stx _ ...) x)
-      (elisp-println (list count msec (if name (symbol->string name) "")
-                           (path->string (syntax-source stx))
-                           (+ 1 (syntax-position stx))))))
-  (when (coverage-counts-enabled)
-    (define-values (all covered) (get-coverage))
-    (for ([stx (in-list (remove-duplicates covered))])
-      (elisp-println (list (path->string (syntax-source stx))
-                           (+ 1 (syntax-position stx))
-                           (+ 1 (syntax-position stx) (syntax-span stx))
-                           1))))
-  (when (execute-counts-enabled)
-    (for ([x (in-list (remove-duplicates (get-execute-counts)))])
-      (match-define (cons stx count) x)
-      (elisp-println (list (path->string (syntax-source stx))
-                           (+ 1 (syntax-position stx))
-                           (+ 1 (syntax-position stx) (syntax-span stx))
-                           count))))
-  (void))
+                 Error Context: @(current-ctx-lvl)}))
+
+(define (get-profile)
+  (elisp-println
+   ;; TODO: Filter files from racket-mode itself, b/c just noise?
+   (for/list ([x (in-list (get-profile-results))])
+     (match-define (list count msec name stx _ ...) x)
+     (list count
+           msec
+           (if name (symbol->string name) "")
+           (path->string (syntax-source stx))
+           (syntax-position stx)
+           (+ (syntax-position stx) (syntax-span stx))))))
+
+(define (get-cover/count)
+  (elisp-println
+   (let-values ([(all covered) (get-coverage)])
+     (for/list ([stx (in-list (remove-duplicates covered))])
+       (list (path->string (syntax-source stx))
+             (+ 1 (syntax-position stx))
+             (+ 1 (syntax-position stx) (syntax-span stx))
+             1)))))
+
+(define (get-cover/execute)
+  (elisp-println
+   (for/list ([x (in-list (remove-duplicates (get-execute-counts)))])
+     (match-define (cons stx count) x)
+     (list (path->string (syntax-source stx))
+           (+ 1 (syntax-position stx))
+           (+ 1 (syntax-position stx) (syntax-span stx))
+           count))))
 
 (define (run-or-top which put/stop rerun)
   ;; Support both the ,run and ,top commands. Latter has no first path

@@ -27,9 +27,9 @@
 (require 'hideshow)
 
 (defun racket-run (&optional errortracep)
-  "Save and evaluate the buffer in REPL, like DrRacket's Run.
+  "Save and evaluate the buffer in REPL, much like DrRacket's Run.
 
-When you run again, the files is evaluated from scratch -- the
+When you run again, the file is evaluated from scratch -- the
 custodian releases resources like threads and the evaluation
 environment is reset to the contents of the file. In other words,
 like DrRacket, this provides the predictability of a \"static\"
@@ -84,6 +84,13 @@ Others are available only as a command in the REPL.
       not specified individually.
 "
   (interactive "P")
+  (racket--do-run (if errortracep
+                      'full
+                    racket-error-context)))
+
+(defun racket--do-run (context-level)
+  "Helper function for `racket-run'-like commands.
+Supplies CONTEXT-LEVEL to the back-end ,run command; see run.rkt."
   (save-buffer)
   (racket--invalidate-completion-cache)
   (racket--invalidate-type-cache)
@@ -91,10 +98,7 @@ Others are available only as a command in the REPL.
                         (racket--quoted-buffer-file-name)
                         racket-memory-limit
                         racket-pretty-print
-                        (if errortracep
-                            'full
-                          racket-error-context))))
-
+                        context-level)))
 (defun racket-racket ()
   "Do `racket <file>` in `*shell*` buffer."
   (interactive)
@@ -103,7 +107,7 @@ Others are available only as a command in the REPL.
                          (racket--quoted-buffer-file-name))))
 
 (defun racket-test ()
-  "Do `(require (submod \".\" test))` in `*racket*` buffer.
+  "Do `(require (submod \".\" test))` in `*Racket REPL*` buffer.
 
 See also:
 - `racket-fold-all-tests'
@@ -319,7 +323,6 @@ Returns the buffer in which the description was written."
     m)
   "Keymap for Racket Describe mode.")
 
-;;;###autoload
 (define-derived-mode racket-describe-mode fundamental-mode
   "RacketDescribe"
   "Major mode for describing Racket functions.

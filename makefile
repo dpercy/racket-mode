@@ -27,6 +27,7 @@ compile: clean \
 	racket-keywords-and-builtins.elc \
 	racket-make-doc.elc \
 	racket-mode.elc \
+	racket-profile.elc \
 	racket-repl.elc \
 	racket-tests.elc \
 	racket-util.elc
