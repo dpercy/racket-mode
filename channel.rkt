@@ -22,7 +22,7 @@
     cover/execute)) ;high with execute-counts-enabled
 
 (define errortrace-levels
-  '(high     ;compile-context-preservation-enabled #t + errortrace
+  `(high     ;compile-context-preservation-enabled #t + errortrace
     ,@profile/coverage-levels))
 
 (define context-levels
