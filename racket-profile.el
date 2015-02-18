@@ -23,27 +23,39 @@
 (defvar racket--profile-sort-col 1)
 
 (defun racket-profile ()
-  "Run with profiling enabled. Navigate results."
+  "Get profiling results in a `racket-profile-mode' buffer.
+
+\\{racket-profile-mode-map}
+
+If the buffer has already been run with `racket-error-context'
+set to 'profile, shows those results. Otherwise, prompts to
+re-run with profiling instrumentation.
+
+You may evaluate additonal expressions in the REPL. They will be
+profiled, too. In that case use `racket--profile-refresh' to see
+the updated results."
   (interactive)
   (when (eq major-mode 'racket-mode)
-    (racket--do-run 'profile)
     (setq racket--profile-results (racket--eval/sexpr ",get-profile"))
+    (unless racket--profile-results
+      (y-or-n-p "No profiling results. Re-run with profiler enabled? ")
+      (racket--do-run 'profile)
+      (racket-profile))
     (setq racket--profile-sort-col 1)
     (with-current-buffer (get-buffer-create "*Racket Profile*")
       (racket-profile-mode)
-      (racket--profile-sort)
+      (racket--profile-draw)
       (pop-to-buffer (current-buffer)))))
 
-(defun racket--profile-sort ()
-  "Toggle sort between Count and Time."
+(defun racket--profile-refresh ()
   (interactive)
+  (setq racket--profile-results (racket--eval/sexpr ",get-profile"))
+  (racket--profile-draw))
+
+(defun racket--profile-draw ()
   (read-only-mode -1)
   (erase-buffer)
   (setq truncate-lines t) ;let run off right edge
-  (setq racket--profile-sort-col
-        (cl-case racket--profile-sort-col
-          (0 1)
-          (t 0)))
   ;; TODO: Would be nice to set the Count and Time column widths based
   ;; on max values.
   (setq header-line-format
@@ -64,6 +76,12 @@
                      "\n"))
   (read-only-mode 1)
   (goto-char (point-min)))
+
+(defun racket--profile-sort ()
+  "Toggle sort between Count and Time."
+  (interactive)
+  (setq racket--profile-sort-col (if (= racket--profile-sort-col 0) 1 0))
+  (racket--profile-draw))
 
 (defvar racket--profile-overlay-this nil)
 (defvar racket--profile-overlay-that nil)
@@ -111,6 +129,7 @@
     (mapc (lambda (x)
             (define-key m (kbd (car x)) (cadr x)))
           '(("q"   racket--profile-quit)
+            ("g"   racket--profile-refresh)
             ("n"   racket--profile-next)
             ("p"   racket--profile-prev)
             ("RET" racket--profile-visit)
@@ -120,7 +139,7 @@
 
 (define-derived-mode racket-profile-mode fundamental-mode
   "RacketProfile"
-  "Major mode for view Racket profiler results.
+  "Major mode for results of `racket-profile'.
 
 \\{racket-profile-mode-map}"
   (setq show-trailing-whitespace nil))
