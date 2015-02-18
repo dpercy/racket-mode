@@ -100,6 +100,7 @@ the updated results."
         (find-file-other-window file)
         (setq racket--profile-overlay-that (make-overlay beg end (current-buffer)))
         (overlay-put racket--profile-overlay-that 'face 'next-error)
+        (goto-char beg)
         (add-hook 'pre-command-hook #'racket--profile-remove-overlay)
         (select-window win)))))
 
