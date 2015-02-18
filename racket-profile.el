@@ -56,18 +56,18 @@ the updated results."
   (read-only-mode -1)
   (erase-buffer)
   (setq truncate-lines t) ;let run off right edge
-  ;; TODO: Would be nice to set the Count and Time column widths based
+  ;; TODO: Would be nice to set the Calls and Msec column widths based
   ;; on max values.
   (setq header-line-format
         (format " %8s %6s %-20.20s %s"
-                (if (= 0 racket--profile-sort-col) "COUNT" "Count")
-                (if (= 1 racket--profile-sort-col) "TIME" "Time")
-                "Name"
+                (if (= 0 racket--profile-sort-col) "CALLS" "Calls")
+                (if (= 1 racket--profile-sort-col) "MSEC" "Msec")
+                "Name (inferred)"
                 "File"))
   (insert (mapconcat (lambda (xs)
-                       (cl-destructuring-bind (count time name file beg end) xs
+                       (cl-destructuring-bind (calls msec name file beg end) xs
                          (propertize (format "%8d %6d %-20.20s %s"
-                                             count time name file)
+                                             calls msec name file)
                                      'racket-profile-location
                                      (list file beg end))))
                      (sort (cl-copy-list racket--profile-results)
@@ -78,7 +78,7 @@ the updated results."
   (goto-char (point-min)))
 
 (defun racket--profile-sort ()
-  "Toggle sort between Count and Time."
+  "Toggle sort between Calls and Msec."
   (interactive)
   (setq racket--profile-sort-col (if (= racket--profile-sort-col 0) 1 0))
   (racket--profile-draw))
