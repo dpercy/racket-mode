@@ -1,6 +1,7 @@
 #lang at-exp racket/base
 
-(require help/help-utils
+(require errortrace/errortrace-lib
+         help/help-utils
          macro-debugger/analysis/check-requires
          racket/contract
          racket/file
@@ -14,6 +15,7 @@
          racket/string
          syntax/modresolve
          (only-in xml xexpr->string)
+         "channel.rkt"
          "defn.rkt"
          "logger.rkt"
          "scribble.rkt"
@@ -25,7 +27,7 @@
 (module+ test
   (require rackunit))
 
-(define (make-prompt-read path put/stop rerun)
+(define (make-prompt-read path)
   (define-values (base name _) (cond [path (split-path path)]
                                      [else (values (current-directory) "" #f)]))
   (λ ()
@@ -83,9 +85,9 @@
 
 ;;; run, top, info
 
-;; Parameter-like interface, but we don't care about thread-local
-;; stuff. We do care about calling collect-garbage IFF the new limit
-;; is less than the old one or less than the current actual usage.
+;; Parameter-like interface, but we don't want thread-local. We do
+;; want to call collect-garbage IFF the new limit is less than the old
+;; one or less than the current actual usage.
 (define current-mem
   (let ([old #f])
     (case-lambda
@@ -97,30 +99,63 @@
             (collect-garbage))
        (set! old new)])))
 
-(define current-pp? (make-parameter #t))
+;; Likewise: Want parameter signature but NOT thread-local.
+(define-syntax-rule (make-parameter-ish init)
+  (let ([old init])
+    (case-lambda
+      [() old]
+      [(new) (set! old new)])))
 
-(define current-err-ctx (make-parameter 'low)) ;(or/c 'low 'medium 'high)
+(define current-pp? (make-parameter-ish #t))
+(define current-ctx-lvl (make-parameter-ish 'low)) ;context-level?
 
 (define (info)
   (displayln @~a{Memory Limit:  @(current-mem)
                  Pretty Print:  @(current-pp?)
-                 Error Context: @(current-err-ctx)}))
+                 Error Context: @(current-ctx-lvl)})
+  ;; The following is just for dev/testing, not the final approach.
+  (when (profiling-enabled)
+    (for ([x (in-list (get-profile-results))])
+      (match-define (list count msec name stx _ ...) x)
+      (elisp-println (list count msec (if name (symbol->string name) "")
+                           (path->string (syntax-source stx))
+                           (+ 1 (syntax-position stx))))))
+  (when (coverage-counts-enabled)
+    (define-values (all covered) (get-coverage))
+    (for ([stx (in-list (remove-duplicates covered))])
+      (elisp-println (list (path->string (syntax-source stx))
+                           (+ 1 (syntax-position stx))
+                           (+ 1 (syntax-position stx) (syntax-span stx))
+                           1))))
+  (when (execute-counts-enabled)
+    (for ([x (in-list (remove-duplicates (get-execute-counts)))])
+      (match-define (cons stx count) x)
+      (elisp-println (list (path->string (syntax-source stx))
+                           (+ 1 (syntax-position stx))
+                           (+ 1 (syntax-position stx) (syntax-span stx))
+                           count))))
+  (void))
 
 (define (run-or-top which put/stop rerun)
   ;; Support both the ,run and ,top commands. Latter has no first path
-  ;; arg, but otherwise they share subsequent optional args.
+  ;; arg, but otherwise they share subsequent optional args. (Note:
+  ;; The complexity here is from the desire to let user type simply
+  ;; e.g. ",top" or ",run file" and use the existing values for the
+  ;; omitted args. We're intended mainly to be used from Emacs, which
+  ;; can/does always supply all the args. But, may as well make it
+  ;; convenient for human users, too.)
   (define (go path)
     (put/stop (rerun (and path (~a path)) ;"/path/file" or /path/file
                      (current-mem)
                      (current-pp?)
-                     (current-err-ctx))))
+                     (current-ctx-lvl))))
   (match (match which
            ['run (read-line->reads)]
            ['top (cons #f (read-line->reads))]) ;i.e. path = #f
-    [(list path (? number? mem) (? boolean? pp?) (and ctx (or 'low 'medium 'high)))
+    [(list path (? number? mem) (? boolean? pp?) (? context-level? ctx))
      (current-mem mem)
      (current-pp? pp?)
-     (current-err-ctx ctx)
+     (current-ctx-lvl ctx)
      (go path)]
     [(list path (? number? mem) (? boolean? pp?))
      (current-mem mem)
@@ -133,7 +168,6 @@
      (go path)]
     [_
      (usage)]))
-
 
 (define (read-line->reads)
   (reads-from-string (read-line)))
