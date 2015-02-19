@@ -64,17 +64,18 @@ the updated results."
                 (if (= 1 racket--profile-sort-col) "MSEC" "Msec")
                 "Name (inferred)"
                 "File"))
-  (insert (mapconcat (lambda (xs)
-                       (cl-destructuring-bind (calls msec name file beg end) xs
-                         (propertize (format "%8d %6d %-20.20s %s"
-                                             calls msec name file)
-                                     'racket-profile-location
-                                     (and file beg end
-                                          (list file beg end)))))
-                     (sort (cl-copy-list racket--profile-results)
-                           (lambda (a b) (> (nth racket--profile-sort-col a)
-                                            (nth racket--profile-sort-col b))))
-                     "\n"))
+  (insert
+   (mapconcat (lambda (xs)
+                (cl-destructuring-bind (calls msec name file beg end) xs
+                  (propertize (format "%8d %6d %-20.20s %s"
+                                      calls msec (or name "") (or file ""))
+                              'racket-profile-location
+                              (and file beg end
+                                   (list file beg end)))))
+              (sort (cl-copy-list racket--profile-results)
+                    (lambda (a b) (> (nth racket--profile-sort-col a)
+                                     (nth racket--profile-sort-col b))))
+              "\n"))
   (read-only-mode 1)
   (goto-char (point-min)))
 
