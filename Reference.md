@@ -100,13 +100,14 @@ q		racket--profile-quit
 
 
 
-If the buffer has already been run with [`racket-error-context`](#racket-error-context)
-set to 'profile, shows those results. Otherwise, prompts to
-re-run with profiling instrumentation.
+Run the buffer with profiling instrumentation enabled.
 
 You may evaluate additonal expressions in the REPL. They will be
 profiled, too. In that case use [`racket--profile-refresh`](#racket--profile-refresh) to see
 the updated results.
+
+Caveat: Only .rkt files can be instrumented. You may need to
+delete compiled/*.zo files.
 
 ## Test
 
