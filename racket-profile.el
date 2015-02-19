@@ -139,7 +139,7 @@ the updated results."
     m)
   "Keymap for Racket Profile mode.")
 
-(define-derived-mode racket-profile-mode fundamental-mode
+(define-derived-mode racket-profile-mode special-mode
   "RacketProfile"
   "Major mode for results of `racket-profile'.
 
