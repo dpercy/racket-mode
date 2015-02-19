@@ -20,21 +20,24 @@
 (require 'racket-edit)
 
 (defvar racket--profile-results nil)
-(defvar racket--profile-sort-col 1)
+(defvar racket--profile-sort-col 1) ;0=Calls, 1=Msec
 
 (defun racket-profile ()
-  "Get profiling results in a `racket-profile-mode' buffer.
+  "Runs with profiling instrumentation and shows results.
 
-\\{racket-profile-mode-map}
+Results are presented in a `racket-profile-mode' buffer, which
+also lets you quickly view the source code.
 
-Run the buffer with profiling instrumentation enabled.
+You may evaluate expressions in the REPL. They are also profiled.
+Use `racket--profile-refresh' to see the updated results. (In
+other words a possible workflow is: `racket-profile' a .rkt file,
+call one its functions in the REPL, and refresh the profile
+results.)
 
-You may evaluate additonal expressions in the REPL. They will be
-profiled, too. In that case use `racket--profile-refresh' to see
-the updated results.
+Caveat: Only source files are instrumented. You may need to
+delete compiled/*.zo files.
 
-Caveat: Only .rkt files can be instrumented. You may need to
-delete compiled/*.zo files."
+\\{racket-profile-mode-map}"
   (interactive)
   (when (eq major-mode 'racket-mode)
     (racket--do-run 'profile)
