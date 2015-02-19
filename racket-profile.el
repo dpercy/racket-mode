@@ -27,20 +27,18 @@
 
 \\{racket-profile-mode-map}
 
-If the buffer has already been run with `racket-error-context'
-set to 'profile, shows those results. Otherwise, prompts to
-re-run with profiling instrumentation.
+Run the buffer with profiling instrumentation enabled.
 
 You may evaluate additonal expressions in the REPL. They will be
 profiled, too. In that case use `racket--profile-refresh' to see
-the updated results."
+the updated results.
+
+Caveat: Only .rkt files can be instrumented. You may need to
+delete compiled/*.zo files."
   (interactive)
   (when (eq major-mode 'racket-mode)
+    (racket--do-run 'profile)
     (setq racket--profile-results (racket--eval/sexpr ",get-profile"))
-    (unless racket--profile-results
-      (y-or-n-p "No profiling results. Re-run with profiler enabled? ")
-      (racket--do-run 'profile)
-      (racket-profile))
     (setq racket--profile-sort-col 1)
     (with-current-buffer (get-buffer-create "*Racket Profile*")
       (racket-profile-mode)
