@@ -21,6 +21,9 @@
 
 (defvar racket--profile-results nil)
 (defvar racket--profile-sort-col 1) ;0=Calls, 1=Msec
+(defvar racket--profile-show-zero nil)
+(defvar racket--profile-overlay-this nil)
+(defvar racket--profile-overlay-that nil)
 
 (defun racket-profile ()
   "Runs with profiling instrumentation and shows results.
@@ -75,7 +78,11 @@ delete compiled/*.zo files.
                               'racket-profile-location
                               (and file beg end
                                    (list file beg end)))))
-              (sort (cl-copy-list racket--profile-results)
+              (sort (cl-remove-if-not (lambda (x)
+                                        (or racket--profile-show-zero
+                                            (/= 0 (nth 0 x))
+                                            (/= 0 (nth 1 x))))
+                                      (cl-copy-list racket--profile-results))
                     (lambda (a b) (> (nth racket--profile-sort-col a)
                                      (nth racket--profile-sort-col b))))
               "\n"))
@@ -88,8 +95,11 @@ delete compiled/*.zo files.
   (setq racket--profile-sort-col (if (= racket--profile-sort-col 0) 1 0))
   (racket--profile-draw))
 
-(defvar racket--profile-overlay-this nil)
-(defvar racket--profile-overlay-that nil)
+(defun racket--profile-show-zero ()
+  "Toggle between showing results with zero Calls or Msec."
+  (interactive)
+  (setq racket--profile-show-zero (not racket--profile-show-zero))
+  (racket--profile-draw))
 
 (defun racket--profile-visit ()
   (interactive)
@@ -138,6 +148,7 @@ delete compiled/*.zo files.
             ("g"   racket--profile-refresh)
             ("n"   racket--profile-next)
             ("p"   racket--profile-prev)
+            ("z"   racket--profile-show-zero)
             ("RET" racket--profile-visit)
             (","   racket--profile-sort)))
     m)
