@@ -40,13 +40,15 @@ delete compiled/*.zo files.
 \\{racket-profile-mode-map}"
   (interactive)
   (when (eq major-mode 'racket-mode)
+    (message "Running with profiling instrumentation and getting results...")
     (racket--do-run 'profile)
     (setq racket--profile-results (racket--eval/sexpr ",get-profile"))
     (setq racket--profile-sort-col 1)
     (with-current-buffer (get-buffer-create "*Racket Profile*")
       (racket-profile-mode)
       (racket--profile-draw)
-      (pop-to-buffer (current-buffer)))))
+      (pop-to-buffer (current-buffer)))
+    (message "")))
 
 (defun racket--profile-refresh ()
   (interactive)

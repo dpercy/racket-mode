@@ -72,7 +72,7 @@
 
 (defun racket--get-old-input ()
   "Snarf the sexp ending at point."
-  (if (looking-back comint-prompt-regexp (max 0 (- (point) 80)))
+  (if (racket--repl-looking-back-at-prompt)
       ""
     (save-excursion
       (let ((end (point)))
@@ -222,30 +222,34 @@ and don't want to affect the selected window."
       (set-process-coding-system (get-buffer-process racket--repl-buffer-name)
                                  'utf-8 'utf-8)
       (racket-repl-mode)
-      (racket--repl-wait-for-prompt)
-      (message ""))))
+      (racket--repl-wait-for-prompt))))
 
-(defun racket--repl-wait-for-prompt ()
+(defun racket--repl-wait-for-prompt (&optional silent)
   "Wait up to `racket-wait-for-prompt-timeout' seconds for
-`racket--repl-has-prompt-p' to be t."
-  (message "Waiting for Racket prompt...")
+`racket--repl-has-prompt' to be t."
+  (sit-for 0.1) ;ensure any pending \n displayed in REPL buffer
+  (unless silent (message "Waiting for Racket prompt..."))
   (let ((deadline (+ (float-time) racket-wait-for-prompt-timeout)))
-    (while (and (not (racket--repl-has-prompt-p))
+    (while (and (not (racket--repl-has-prompt))
                 (< (float-time) deadline))
       (accept-process-output (get-buffer-process racket--repl-buffer-name)
                              (- deadline (float-time)))))
-  (unless (racket--repl-has-prompt-p)
+  (unless silent (message ""))
+  (unless (racket--repl-has-prompt)
     (error "Timeout waiting for Racket REPL prompt")))
 
-(defun racket--repl-has-prompt-p ()
+(defun racket--repl-has-prompt ()
   "Is the REPL process alive and is the Racket prompt the last thing in the buffer?"
   (and (comint-check-proc racket--repl-buffer-name)
        (with-current-buffer racket--repl-buffer-name
          (save-excursion
            (goto-char (point-max))
-           (and (re-search-backward "\n" nil t)
-                (re-search-forward comint-prompt-regexp nil t)
-                (= (point) (point-max)))))))
+           (racket--repl-looking-back-at-prompt)))))
+
+(defun racket--repl-looking-back-at-prompt ()
+  (and (re-search-backward "\n" nil t)
+       (re-search-forward comint-prompt-regexp nil t)
+       (= (point) (point-max))))
 
 ;;;
 
@@ -377,7 +381,7 @@ With prefix arg, open the N-th last shown image."
   ;; process output doesn't end with a newline (e.g. `display` not
   ;; `displayln`) the opening ≺ helps the user visually delimit the
   ;; output from the following prompt.
-  (setq-local comint-prompt-regexp "^≺.*?≻ +")
+  (setq-local comint-prompt-regexp "≺.*?≻ +")
   (setq-local comint-use-prompt-regexp t)
   (setq-local comint-prompt-read-only t) ;rebind C-w to `comint-kill-region'!
   (setq-local mode-line-process nil)

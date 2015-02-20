@@ -30,6 +30,8 @@
 resulting output to a *Racket REPL Redirected Output* buffer, and
 return that buffer's name."
   (racket-repl-ensure-buffer-and-process)
+  ;; Ensure we don't get output from previous command.
+  (racket--repl-wait-for-prompt t)
   ;; Important: Leading space in buffer name disables undo for it.
   ;; That in turn means that racket--eval/buffer in the midst of a
   ;; command won't cause an undo-boundary to be inserted.
