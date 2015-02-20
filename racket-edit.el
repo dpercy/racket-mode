@@ -85,7 +85,7 @@ Others are available only as a command in the REPL.
 "
   (interactive "P")
   (racket--do-run (if errortracep
-                      'full
+                      'high
                     racket-error-context)))
 
 (defun racket--do-run (context-level)
