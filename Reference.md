@@ -86,7 +86,19 @@ Do `racket <file>` in `*shell*` buffer.
 ### racket-profile
 <kbd>M-x racket-profile</kbd>
 
-Get profiling results in a [`racket-profile-mode`](#racket-profile-mode) buffer.
+Runs with profiling instrumentation and shows results.
+
+Results are presented in a [`racket-profile-mode`](#racket-profile-mode) buffer, which
+also lets you quickly view the source code.
+
+You may evaluate expressions in the REPL. They are also profiled.
+Use [`racket--profile-refresh`](#racket--profile-refresh) to see the updated results. (In
+other words a possible workflow is: [`racket-profile`](#racket-profile) a .rkt file,
+call one its functions in the REPL, and refresh the profile
+results.)
+
+Caveat: Only source files are instrumented. You may need to
+delete compiled/*.zo files.
 
 key             binding
 ---             -------
@@ -97,17 +109,9 @@ g		racket--profile-refresh
 n		racket--profile-next
 p		racket--profile-prev
 q		racket--profile-quit
+z		racket--profile-show-zero
 
 
-
-Run the buffer with profiling instrumentation enabled.
-
-You may evaluate additonal expressions in the REPL. They will be
-profiled, too. In that case use [`racket--profile-refresh`](#racket--profile-refresh) to see
-the updated results.
-
-Caveat: Only .rkt files can be instrumented. You may need to
-delete compiled/*.zo files.
 
 ## Test
 
@@ -541,13 +545,10 @@ program to run more slowly.
     `#t` and to use of `errortrace`, which heavily instruments
     your code and therefore may be significantly slower.
 
-  - 'profile corresponds using all of
-    `compile-context-preservation-enabled`, `errortrace`,
-    `instrumenting-enabled`, `profiling-enabled`. For use with
-    [`racket-profile`](#racket-profile).
-
-Tip: Regardless of this setting, you can enable full errortrace
-for a specific [`racket-run`](#racket-run) using a C-u prefix.
+Tip: Regardless of this setting, you can enable 'high errortrace
+for a specific [`racket-run`](#racket-run) using a C-u prefix. This lets you
+normally run with a faster setting, and temporarily re-run to get
+a more-helpful error message.
 
 ## REPL
 
