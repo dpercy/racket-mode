@@ -46,6 +46,7 @@ http://www.gnu.org/licenses/ for details.")
 (defconst racket-mode-version "0.4")
 
 (require 'racket-edit)
+(require 'racket-profile)
 (require 'racket-repl)
 (require 'racket-collection)
 (require 'racket-util)
