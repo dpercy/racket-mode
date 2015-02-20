@@ -91,7 +91,8 @@ Others are available only as a command in the REPL.
 (defun racket--do-run (context-level)
   "Helper function for `racket-run'-like commands.
 Supplies CONTEXT-LEVEL to the back-end ,run command; see run.rkt."
-  (save-buffer)
+  (when (buffer-modified-p)
+    (save-buffer))
   (racket--invalidate-completion-cache)
   (racket--invalidate-type-cache)
   (racket--eval (format ",run %s %s %s %s\n"
