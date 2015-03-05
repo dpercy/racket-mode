@@ -625,15 +625,32 @@
 ;;; coverage
 
 (define (get-uncovered path)
+  ;; Due to macro expansion, there may be multiple data points for the
+  ;; exact same source location. We want to logically OR them: If
+  ;; any are true, the source location is covered.
+  (define ht (make-hash)) ;; (list src pos span) => cover?
+  (for* ([xs (in-list (get-execute-counts))]
+         [stx (in-value (car xs))]
+         [src (in-value (syntax-source stx))]
+         #:when (equal? src path)
+         [pos (in-value (syntax-position stx))]
+         [span (in-value (syntax-span stx))]
+         [count (in-value (cdr xs))]
+         [cover? (in-value (not (zero? count)))])
+    (define k (list src pos span))
+    (match (hash-ref ht k 'none)
+      ['none (hash-set! ht k cover?)]
+      [#t    (void)]
+      [#f    (hash-set! ht k #t)]))
   (elisp-println
    (consolidate-coverage-ranges
-    (for*/list ([x (in-list (get-execute-counts))]
-                [stx (in-value (car x))]
-                #:when (equal? path (syntax-source stx))
-                [count (in-value (cdr x))]
-                #:when (zero? count))
-      (cons (syntax-position stx)
-            (+ (syntax-position stx) (syntax-span stx)))))))
+    (for*/list ([(loc cover?) (in-hash ht)]
+                #:when (not cover?)
+                [src (in-value (first loc))]
+                #:when (equal? path src)
+                [pos (in-value (second loc))]
+                [span (in-value (third loc))])
+      (cons pos (+ pos span))))))
 
 (define (consolidate-coverage-ranges xs)
   (remove-duplicates (sort xs < #:key car)
