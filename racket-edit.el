@@ -888,13 +888,18 @@ prompt. Answering yes means you can step and break in that other
 file, too.
 
 Upon each break, the source file is shown with point at the
-breakpoint. The minor mode `racket-debug-mode' is enabled, which
-provides additional commands like `racket-debug-mode-step' and
-`racket-debug-mode-go'.
+breakpoint. Uses of top-level and local bindings are drawn
+showing the current values inline. The minor mode
+`racket-debug-mode' is enabled, which provides additional
+commands:
 
-During the break, the Racket REPL may be used to evaluate
+```
+\\{racket-debug-mode-map}
+```
+
+During a break, the Racket REPL may be used to evaluate
 expressions in the namespace of the module. Both top-level and
-local bindings are visible and may be `set!` to new values.
+local bindings may be referenced and `set!` to new values.
 
 The REPL may be used even after the program completes, because
 the code remains instrumented for debugging. If you call
@@ -1058,8 +1063,8 @@ Effectively this sets a one-shot breakpoint then does
 ;;
 ;; Use the work-around described there -- slamming our keys into
 ;; (current-local-keymap). However, also save the original keys, and
-;; restore them in a post-command-hook -- because at that point the
-;; minor mode map will work thereafter.
+;; restore them in a post-command-hook -- because by then the minor
+;; mode map will be used thereafter.
 ;;
 ;; Like I said. Mr. Hankey.
 
@@ -1111,6 +1116,8 @@ Although the buffer becomes read-only, you may still use
 ```
 \\{racket-debug-mode-map}
 ```
+
+See `racket-debug' for more information.
 "
   :lighter " Debug"
   (unless (eq major-mode 'racket-mode)
