@@ -930,7 +930,6 @@ instrumented code, it will break before the first expression. (To
        (insert-file-contents racket--repl-debug-break-output-file)
        (delete-file racket--repl-debug-break-output-file)
        (eval (read (buffer-substring (point-min) (point-max)))))))
-  ;; TODO: Should we avoid setting the timer if no DEBUG: prompt in REPL?
   (setq racket--debug-break-timer
         (run-with-timer racket--debug-break-timer-interval
                         nil
@@ -993,7 +992,10 @@ instrumented code, it will break before the first expression. (To
                    data)))))
 
 (defun racket-debug-mode-step (&optional change-value-p)
-  "Evaluate the next expression and break."
+  "Evaluate the next expression and break.
+
+With prefix, prompts for a value to substitute for the next
+expression."
   (interactive "P")
   (unless racket--debug-break-data
     (error "Not at a break"))
@@ -1056,9 +1058,9 @@ Effectively this sets a one-shot breakpoint then does
 (defun racket-debug-mode-value ()
   "Change the value at point (if any)."
   (interactive)
-  (let* ((old (racket--repl-cmd/sexpr (format "(get %s)" (point))))
+  (let* ((old (racket--repl-cmd/sexpr (format ",(get %s)" (point))))
          (new (read-string "Value: " old)))
-    (racket--repl-cmd/sexpr (format "(set %s %s)" (point) new))))
+    (racket--repl-cmd/sexpr (format ",(set %s %s)" (point) new))))
 
 (defun racket-debug-mode-quit ()
   (interactive)
@@ -1114,6 +1116,8 @@ not affect positions."
 
 ;;; debug frames
 
+(defconst racket-debug-frames-buffer-name "*Debug Frames*")
+
 (defvar racket-debug-frames-mode-map
   (racket--easy-keymap-define
    '(("n"   racket-debug-frames-mode-next)
@@ -1124,7 +1128,7 @@ not affect positions."
 
 (define-derived-mode racket-debug-frames-mode special-mode
   "RacketDebugFrames"
-  "Major mode to debugger frames.
+  "Major mode to show debugger frames for `racket-debug'.
 
 ```
 \\{racket-debug-frames-mode-map}
@@ -1135,15 +1139,17 @@ not affect positions."
 
 (defun racket-debug-frames-mode-quit ()
   (interactive)
-  (let ((win (get-buffer-window "*Debug Frames*")))
+  (let ((win (get-buffer-window racket-debug-frames-buffer-name)))
     (when win
-      (delete-window win))))
+      (delete-window win)
+      (kill-buffer racket-debug-frames-buffer-name))))
 
 (defun racket-debug-frames-mode-draw (frames)
-  (let* ((buf (get-buffer-create "*Debug Frames*"))
+  (let* ((buf (get-buffer-create racket-debug-frames-buffer-name))
+         (new? (not (get-buffer-window buf)))
          (win (or (get-buffer-window buf)
-                  (set-window-buffer (split-window-vertically)
-                                     "*Debug Frames*"))))
+                  (set-window-buffer (split-window-vertically (- window-min-height))
+                                     racket-debug-frames-buffer-name))))
     (with-current-buffer buf
       (unless (eq major-mode 'racket-debug-frames-mode)
         (racket-debug-frames-mode))
@@ -1161,9 +1167,9 @@ not affect positions."
               (insert (propertize (format "%s\n" txt)
                                   'racket-debug-frame-location
                                   (list file pos))))))
-        (goto-char (point-min))
-        ;;(fit-window-to-buffer win 10 1)
-        ))))
+        (goto-char (point-min)) ;current frame is top/first
+        (unless new?
+          (fit-window-to-buffer win 10 1))))))
 
 (defun racket-debug-frames-mode-visit ()
   (interactive)
