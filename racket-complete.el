@@ -63,49 +63,13 @@ See `racket--invalidate-completion-cache' and
            (end (or (racket--complete-prefix-end beg) beg))
            (prefix (and (> end beg) (buffer-substring-no-properties beg end)))
            (cmps (and prefix (racket--complete-prefix prefix))))
-      (and cmps (list beg end cmps)))))
-
-;;; company-mode
-
-(eval-after-load "company"
-  '(progn
-     (defun racket-company-backend (command &optional arg &rest ignore)
-       (interactive (list 'interactive))
-       (cl-case command
-         ('interactive (company-begin-backend 'racket-company-backend))
-         ('prefix (racket--company-prefix))
-         ('candidates (racket--company-candidates
-                       (substring-no-properties arg)))
-         ('location (racket--get-def-file+line arg))
-         ('meta (racket-get-type arg))
-         ('doc-buffer (racket--do-describe arg nil))))
-     (defun racket--do-company-setup ()
-       (set (make-local-variable 'company-echo-delay) 0.01)
-       (set (make-local-variable 'company-backends) '(racket-company-backend))
-       (company-mode (if racket-use-company-mode 1 -1)))))
-
-(defun racket--company-setup ()
-  (when (fboundp 'racket--do-company-setup)
-    (racket--do-company-setup)))
-
-(make-variable-buffer-local
- (defvar racket--company-completions nil))
-
-(defun racket--company-prefix ()
-  (if (nth 8 (syntax-ppss))
-      'stop
-    (let* ((prefix (and (looking-at-p "\\_>")
-                        (racket--get-repl-buffer-process)
-                        (buffer-substring-no-properties
-                         (racket--complete-prefix-begin)
-                         (point))))
-           (cmps (and prefix (racket--complete-prefix prefix))))
-      (setq racket--company-completions (cons prefix cmps))
-      prefix)))
-
-(defun racket--company-candidates (prefix)
-  (and (equal prefix (car racket--company-completions))
-       (cdr racket--company-completions)))
+      (and cmps
+           (list beg end
+                 cmps
+                 :predicate #'identity
+                 :company-docsig #'racket-get-type
+                 :company-doc-buffer #'racket--do-describe
+                 :company-location #'racket--get-def-file+line)))))
 
 ;;; types (i.e. TR types, contracts, and/or function signatures)
 

@@ -158,7 +158,6 @@ http://www.gnu.org/licenses/ for details.")
 \\{racket-mode-map}"
   (racket--variables-for-both-modes)
   (racket--variables-imenu)
-  (racket--company-setup)
   (hs-minor-mode t))
 
 ;;;###autoload
