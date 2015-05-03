@@ -57,15 +57,19 @@ See `racket--invalidate-completion-cache' and
               (point)))
         (scan-error pos)))))
 
+(defun racket--completion-table (f)
+  (if (fboundp 'completion-table-with-cache)
+      (completion-table-with-cache f)
+    (completion-table-dynamic f)))
+
 (defun racket-complete-at-point (&optional predicate)
   (with-syntax-table racket-mode-syntax-table ;probably don't need this??
     (let* ((beg (racket--complete-prefix-begin))
-           (end (or (racket--complete-prefix-end beg) beg))
-           (prefix (and (> end beg) (buffer-substring-no-properties beg end)))
-           (cmps (and prefix (racket--complete-prefix prefix))))
-      (and cmps
-           (list beg end
-                 cmps
+           (end (or (racket--complete-prefix-end beg) beg)))
+      (and (> end beg)
+           (list beg
+                 end
+                 (racket--completion-table #'racket--complete-prefix)
                  :predicate #'identity
                  :company-docsig #'racket-get-type
                  :company-doc-buffer #'racket--do-describe
