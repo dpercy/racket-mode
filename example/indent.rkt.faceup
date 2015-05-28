@@ -182,18 +182,18 @@
   «:racket-selfeval-face:5»«:racket-paren-face:)»
 
 «m:;; »«x:Normal case
-»«:racket-paren-face:(»«k:module» «f:1» «v:2»
+»«:racket-paren-face:(»«k:module» «:racket-selfeval-face:1» «:racket-selfeval-face:2»
   «:racket-selfeval-face:3»
   «:racket-selfeval-face:4»
   «:racket-selfeval-face:5»«:racket-paren-face:)»
 
 «m:;; »«x:Weird case -- but this is how scheme-mode indents it.
-»«:racket-paren-face:(»«k:module» «f:1» «v:2» «:racket-selfeval-face:3»
+»«:racket-paren-face:(»«k:module» «:racket-selfeval-face:1» «:racket-selfeval-face:2» «:racket-selfeval-face:3»
         «:racket-selfeval-face:4»
         «:racket-selfeval-face:5»«:racket-paren-face:)»
 
 «m:;; »«x:Weird case -- but this is how scheme-mode indents it.
-»«:racket-paren-face:(»«k:module» «f:1» «v:2» «:racket-selfeval-face:3» «:racket-selfeval-face:4»
+»«:racket-paren-face:(»«k:module» «:racket-selfeval-face:1» «:racket-selfeval-face:2» «:racket-selfeval-face:3» «:racket-selfeval-face:4»
         «:racket-selfeval-face:5»«:racket-paren-face:)»
 
 «m:;;; »«x:for/fold
