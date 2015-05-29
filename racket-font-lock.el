@@ -104,7 +104,9 @@
        . racket-selfeval-face)
 
       (,(regexp-opt racket-keywords 'symbols) . font-lock-keyword-face)
-      (,(regexp-opt racket-builtins 'symbols) . font-lock-builtin-face)
+      ;; Split into two lists, else "regexp too long" error
+      (,(regexp-opt racket-builtins-1-of-2 'symbols) . font-lock-builtin-face)
+      (,(regexp-opt racket-builtins-2-of-2 'symbols) . font-lock-builtin-face)
       )))
 
 (defconst racket-font-lock-keywords-2
