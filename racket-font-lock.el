@@ -20,7 +20,7 @@
 (require 'cl-lib)
 
 ;; Define 3 levels of font-lock, as documented in 23.6.5 "Levels of
-;; Font Lock". User may control using font-lock-maximum-decoration.
+;; Font Lock". User may control using `font-lock-maximum-decoration'.
 
 ;; Note: font-lock iterates by matcher, doing an re-search-forward
 ;; over the entire region. As a result, it's faster to consolidate
@@ -39,7 +39,8 @@
                    (group (1+ not-newline))))
        (2 font-lock-keyword-face nil t)
        (3 font-lock-variable-name-face nil t))
-    )))
+    ))
+  "Only stx table stuff like strings, comments, plus #lang")
 
 (defconst racket-font-lock-keywords-1
   (eval-when-compile
@@ -107,7 +108,8 @@
       ;; Split into two lists, else "regexp too long" error
       (,(regexp-opt racket-builtins-1-of-2 'symbols) . font-lock-builtin-face)
       (,(regexp-opt racket-builtins-2-of-2 'symbols) . font-lock-builtin-face)
-      )))
+      ))
+  "Also self-evals, keywords and builtins")
 
 (defconst racket-font-lock-keywords-2
   (eval-when-compile
@@ -148,7 +150,7 @@
        (1 font-lock-keyword-face nil t)
        (2 font-lock-function-name-face nil t))
 
-      ;; pretty lambda
+      ;; pretty lambda (deprecated)
       (,(rx (syntax open-parenthesis)
             (? (or "case-" "match-" "opt-"))
             (group "lambda")
@@ -163,7 +165,8 @@
        nil t)
 
       (,(regexp-opt racket-type-list 'symbols) . font-lock-type-face)
-      )))
+      ))
+  "Also parens, modules, function/variable identifiers, Typed Racket types.")
 
 (defconst racket-font-lock-keywords-level-0
   (append racket-font-lock-keywords-0))
