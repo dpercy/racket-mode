@@ -40,7 +40,7 @@
        (2 font-lock-keyword-face nil t)
        (3 font-lock-variable-name-face nil t))
     ))
-  "Only stx table stuff like strings, comments, plus #lang")
+  "Strings, comments, #lang.")
 
 (defconst racket-font-lock-keywords-1
   (eval-when-compile
@@ -104,12 +104,8 @@
               symbol-end))
        . racket-selfeval-face)
 
-      (,(regexp-opt racket-keywords 'symbols) . font-lock-keyword-face)
-      ;; Split into two lists, else "regexp too long" error
-      (,(regexp-opt racket-builtins-1-of-2 'symbols) . font-lock-builtin-face)
-      (,(regexp-opt racket-builtins-2-of-2 'symbols) . font-lock-builtin-face)
       ))
-  "Also self-evals, keywords and builtins")
+  "Self-evals")
 
 (defconst racket-font-lock-keywords-2
   (eval-when-compile
@@ -163,10 +159,22 @@
                   nil)
          font-lock-keyword-face)
        nil t)
+      ))
+  "Parens, modules, function/variable identifiers, Typed Racket types.")
 
+(defconst racket-font-lock-keywords-3
+  (eval-when-compile
+    `(
+      (,(regexp-opt racket-keywords 'symbols) . font-lock-keyword-face)
+      (,(regexp-opt racket-builtins-1-of-2 'symbols) . font-lock-builtin-face)
+      (,(regexp-opt racket-builtins-2-of-2 'symbols) . font-lock-builtin-face)
       (,(regexp-opt racket-type-list 'symbols) . font-lock-type-face)
       ))
-  "Also parens, modules, function/variable identifiers, Typed Racket types.")
+  "Function/variable identifiers, Typed Racket types.
+
+Note: To the extent you use #lang racket or #typed/racket, this
+may be handy. But Racket is also a tool to make #lang's, and this
+doesn't really fit that.")
 
 (defconst racket-font-lock-keywords-level-0
   (append racket-font-lock-keywords-0))
@@ -180,10 +188,17 @@
           racket-font-lock-keywords-1
           racket-font-lock-keywords-2))
 
+(defconst racket-font-lock-keywords-level-3
+  (append racket-font-lock-keywords-0
+          racket-font-lock-keywords-1
+          racket-font-lock-keywords-2
+          racket-font-lock-keywords-3))
+
 (defconst racket-font-lock-keywords
   '(racket-font-lock-keywords-level-0
     racket-font-lock-keywords-level-1
-    racket-font-lock-keywords-level-2))
+    racket-font-lock-keywords-level-2
+    racket-font-lock-keywords-level-3))
 
 
 ;;; let forms
@@ -198,7 +213,8 @@ Note: This works only when the let form has a closing paren.
 \(Otherwise, when you type an incomplete let form before existing
 code, this would mistakenly treat the existing code as part of
 the let form.) The font-lock will kick in after you type the
-closing paren. Or if you use paredit, it will already be there."
+closing paren. Or if you use electric-pair-mode, paredit, or
+simillar, it will already be there."
   (while (re-search-forward "(let" limit t)
     (when (racket--inside-complete-sexp)
       ;; Check for named let

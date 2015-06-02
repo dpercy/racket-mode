@@ -156,13 +156,20 @@ supply an association list to specify different values for different
 major modes.
 
 Historically you might choose a lower level for speed. These days you
-might do so because you prefer a "less gaudy" appearance.
+might do so because you prefer a simpler appearance.
 
-Racket-mode supports three levels of font-lock (0, 1, 2). The lowest
-level only highlights strings, comments, and `#lang`. The highest
-level highlights identifiers provided by `racket`, `typed/racket`,
-`racket/syntax`, and `syntax/parse`, identifiers in `define`-like and
-`let`-like forms, and much more.
+Racket-mode supports four, increasing levels of font-lock:
+
+0: Just strings, comments, and `#lang`.
+
+1: `#:keyword`s and self-evaluating literals like numbers, `'symbol`s,
+   `'|symbols with spaces|`, regular expressions.
+
+2: Identifiers in `define`-like and `let`-like forms.
+
+3: Identifiers provided by `racket`, `typed/racket`, `racket/syntax`,
+   and `syntax/parse`. (This level effectively treats Racket as a
+   language, instead of a language for making languages.)
 
 ## Documentation
 

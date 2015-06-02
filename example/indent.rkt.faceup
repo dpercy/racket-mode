@@ -114,9 +114,15 @@
 
 «:racket-paren-face:(»«k:syntax-case*»
     stx
-    «:racket-paren-face:(»«k:module» «k:#%module-begin» «k:define-values» «k:define-syntaxes»
-            «k:define» «b:define/contract»
-            «k:define-syntax» «k:struct» «k:define-struct»«:racket-paren-face:)»
+    «:racket-paren-face:(»«k:#%module-begin»
+     «k:module»
+     «k:define-values»
+     «k:define-syntaxes»
+     «k:define»
+     «b:define/contract»
+     «k:define-syntax»
+     «k:struct»
+     «k:define-struct»«:racket-paren-face:)»
     x
   «:racket-paren-face:[(»«k:_» x«:racket-paren-face:)» #«:racket-selfeval-face:'#f»«:racket-paren-face:]»
   «:racket-paren-face:[(»«k:_» x y«:racket-paren-face:)» #«:racket-selfeval-face:'#t»«:racket-paren-face:])»
